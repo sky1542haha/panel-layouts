@@ -41,7 +41,8 @@ framing:[['face','얼굴 클로즈업'],['upper','상반신 클로즈업'],['wai
 height:[['3','머리보다 확실히 위'],['2','이마/머리 높이'],['1','눈보다 약간 위'],['0','눈높이'],['-1','가슴 높이'],['-2','허리/골반 높이'],['-3','허벅지/무릎 높이'],['-4','바닥 가까이']],
 perspective:[['strong','강한 원근감'],['moderate','약간 강한 원근감'],['natural','자연스러운 원근감'],['compressed','약간 압축된 원근감'],['strong_compressed','강하게 압축된 원근감']],
 frameX:[['far_left','극좌측'],['left','좌측'],['left_third','좌측 1/3'],['center','중앙'],['right_third','우측 1/3'],['right','우측'],['far_right','극우측']],
-focus:[['woman','여성 중심'],['face','여성 얼굴 최우선'],['contact','여성 + 접촉부위'],['both','두 사람 모두'],['scene','전체 장면']]
+focus:[['woman','여성 중심'],['face','여성 얼굴 최우선'],['contact','여성 + 접촉부위'],['both','두 사람 모두'],['scene','전체 장면']],
+cameraAnchor:[['independent','독립 카메라'],['man_pov','남성 시점 (POV)']]
 };
 const modeOpts='<option value="direct">직접선택</option><option value="random">랜덤</option><option value="ai">AI 자동</option>';
 function sel(id,label,opts,def,allowMode=true){return `<div class="field"><label>${label}</label>${allowMode?`<select data-mode="${id}">${modeOpts}</select>`:''}<select id="${id}">${opts.map(o=>`<option value="${o[0]}" ${o[0]===def?'selected':''}>${o[1]}</option>`).join('')}</select></div>`}
@@ -54,14 +55,30 @@ function render(){document.querySelector('#controls').innerHTML=`
 <section class="section"><h2>여성 · 얼굴</h2><div class="grid">${sel('personality','성격',OPT.personality,'calm')}${sel('expression','순간 표정',OPT.expression,'neutral')}${sel('intensity','표정 강도',OPT.intensity,'clear')}${sel('head','머리 / 턱 각도',OPT.head,'neutral')}${sel('faceDirection','얼굴 방향',OPT.faceDirection,'follow_body')}${sel('gaze','시선',OPT.gaze,'camera')}</div></section>
 <section class="section"><h2>여성 · 자세</h2><div class="grid">${sel('poseMode','자세 유형',OPT.poseMode,'standing',false)}${sel('seatType','앉는 위치',OPT.seatType,'chair',false)}<div id="poseSlot"></div><div id="handsSlot"></div>${sel('bodyDirection','몸 방향',bodyAngle,'0')}</div></section>
 <section class="section"><h2>남성 / 관계</h2><div class="grid">${sel('representation','남성 표현 방식',OPT.representation,'visible')}${sel('manPose','남성 자세',OPT.manPose,'kneel_upright')}${sel('manDirection','남성 방향',OPT.manDirection,'toward')}${sel('relative','여성 기준 상대 위치',OPT.relative,'front')}${sel('distance','두 사람의 거리',OPT.distance,'arm_reach')}</div></section>
-<section class="section"><h2>카메라</h2><div class="grid">${sel('framing','프레이밍',OPT.framing,'mid_thigh')}${rangeMode('distanceAdjust','카메라 거리 조정',-50,50,0,'direct')}${sel('cameraAngle','카메라 수평 위치',angle,'0')}${sel('height','카메라 높이',OPT.height,'0')}${sel('tilt','카메라 수직 틸트',tilt,'0')}${sel('perspective','원근감',OPT.perspective,'natural')}</div></section>
+<section class="section"><h2>카메라</h2><div class="grid">${sel('cameraAnchor','카메라 기준점',OPT.cameraAnchor,'independent')}${sel('framing','프레이밍',OPT.framing,'mid_thigh')}${rangeMode('distanceAdjust','카메라 거리 조정',-50,50,0,'direct')}${sel('cameraAngle','카메라 수평 위치',angle,'0')}${sel('height','카메라 높이',OPT.height,'0')}${sel('tilt','카메라 수직 틸트',tilt,'0')}${sel('perspective','원근감',OPT.perspective,'natural')}</div></section>
 <section class="section"><h2>프레임 구성 / 초점</h2><div class="grid">${sel('frameX','여성의 가로 위치',OPT.frameX,'center')}${rangeMode('frameXAdjust','가로 위치 조정',-50,50,0,'direct')}${rangeMode('frameYAdjust','세로 위치 조정',-50,50,0,'ai')}${sel('focus','초점 대상',OPT.focus,'woman')}${rangeMode('blurAdjust','흐림 / 심도 조정',-50,50,0,'ai')}</div></section>
 <section class="section"><h2>자유 입력</h2><div class="grid"><div class="field full"><label>의상</label><textarea id="outfit" rows="2"></textarea></div><div class="field full"><label>배경</label><textarea id="background" rows="2"></textarea></div><div class="field full"><label>추가 프롬프트</label><textarea id="extra" rows="3"></textarea></div></div></section>`;
 updatePoseSlots();document.querySelector('#poseMode').onchange=updatePoseSlots;document.querySelector('#seatType').onchange=updatePoseSlots;
 ['distanceAdjust','frameXAdjust','frameYAdjust','blurAdjust'].forEach(id=>document.querySelector('#'+id).oninput=e=>document.querySelector('#'+id+'V').textContent=e.target.value);
 bindModeControls();
+bindCameraAnchor();
 }
 function bindModeControls(){document.querySelectorAll('select[data-mode]').forEach(modeEl=>{const id=modeEl.dataset.mode;const sync=()=>{const valueEl=document.querySelector('#'+id);if(valueEl)valueEl.disabled=modeEl.value!=='direct';};modeEl.onchange=sync;sync();});}
+
+function bindCameraAnchor(){
+ const modeEl=document.querySelector('[data-mode="cameraAnchor"]'), valueEl=document.querySelector('#cameraAnchor');
+ if(!modeEl||!valueEl)return;
+ const sync=()=>{
+   const pov=modeEl.value!=='ai'&&valueEl.value==='man_pov';
+   for(const id of ['cameraAngle','height']){
+     const m=document.querySelector(`[data-mode="${id}"]`),v=document.querySelector('#'+id);
+     if(m)m.disabled=pov;
+     if(v)v.disabled=pov||(!m?false:m.value!=='direct');
+   }
+   valueEl.title=pov?'남성의 실제 눈 위치가 카메라의 수평 위치와 높이를 결정합니다.':'';
+ };
+ modeEl.addEventListener('change',sync);valueEl.addEventListener('change',sync);sync();
+}
 function updatePoseSlots(){const sit=document.querySelector('#poseMode').value==='sitting';document.querySelector('#seatType').closest('.field').style.display=sit?'block':'none';let po=OPT.standingPose,ha=OPT.standHands;if(sit){const t=document.querySelector('#seatType').value;po=t==='chair'?OPT.chairPose:t==='mid'?OPT.midPose:OPT.highPose;ha=OPT.sitHands}document.querySelector('#poseSlot').innerHTML=sel('bodyPose','몸 / 다리 자세',po,po[0][0]);document.querySelector('#handsSlot').innerHTML=sel('handAction','손 / 팔 동작',ha,ha[0][0]);bindModeControls();}
 const CONTACT=new Set(['shoulder','wrist','collar_one','collar_both','chin_index','chin_hand','both_cheeks','cheek_pinch','cheek_press','head_stroke','head_rest','occiput','forehead']);
 const CONTACT_REGION={shoulder:'upper',wrist:'waist',collar_one:'upper',collar_both:'upper',chin_index:'face',chin_hand:'face',both_cheeks:'face',cheek_pinch:'face',cheek_press:'face',head_stroke:'face',head_rest:'face',occiput:'face',forehead:'face'};
@@ -166,7 +183,7 @@ function resolve(){
  const precisionContact=CONTACT.has(s.woman.handAction.value)&&s.woman.handAction.mode!=='ai';
  s.man.representation=pick('representation',{precisionContact});
  s.man.pose=pick('manPose');s.man.direction=pick('manDirection');s.man.relative=pick('relative');
- s.camera={framing:pick('framing'),distanceAdjust:pickScalar('distanceAdjust'),horizontalAngle:pick('cameraAngle'),height:pick('height'),tilt:pick('tilt'),perspective:pick('perspective')};
+ s.camera={anchor:pick('cameraAnchor'),framing:pick('framing'),distanceAdjust:pickScalar('distanceAdjust'),horizontalAngle:pick('cameraAngle'),height:pick('height'),tilt:pick('tilt'),perspective:pick('perspective')};
  s.composition={frameX:pick('frameX'),frameXAdjust:pickScalar('frameXAdjust'),frameYAdjust:pickScalar('frameYAdjust')};
  s.focus={target:pick('focus'),blurAdjust:pickScalar('blurAdjust')};
  const h=s.woman.handAction.value;let contact=s.woman.handAction.mode!=='ai'&&CONTACT.has(h);
@@ -304,11 +321,19 @@ function compile(s){let a=[];
  else if(s.man.representation.value==='silhouette')a.push('Render him primarily as a softly defined secondary silhouette or partial presence; reveal only the anatomy necessary to make any selected precise contact intelligible.');
  const fr={face:'Frame her from the top of her head through her face, neck and a small amount of shoulder.',upper:'Frame her from the top of her head to the lower chest or rib area.',waist:'Frame her from the top of her head to approximately the waist.',mid_thigh:'Frame her from the top of her head to approximately mid-thigh.',above_knee:'Frame her from the top of her head to just above the knees.',full:'Show her complete body from head through both feet without cropping either.',wide_full:'Show her complete body from head through both feet with substantial surrounding environment and relational space.'};
  if(s.camera.framing.mode==='ai')a.push('Choose only the framing naturally while keeping the woman as the dominant subject.');else a.push(fr[s.camera.framing.value]);
- // Compile camera axes independently. One delegated axis must never suppress explicit values on the others.
- if(s.camera.horizontalAngle.mode==='ai')a.push('Choose only the horizontal camera position naturally; preserve explicit camera height, tilt, framing and woman body orientation.');
- else {const ca=+s.camera.horizontalAngle.value;a.push(ca===0?'Position the camera directly in front of the woman.':`Position the camera approximately ${Math.abs(ca)} degrees to the woman's ${ca<0?'left':'right'}.`);}
- if(s.camera.height.mode==='ai')a.push('Choose only the camera height naturally, using the woman as the height reference; preserve explicit horizontal camera position and tilt.');
- else a.push(`Set the camera height at ${txt(OPT.height,s.camera.height.value)} relative to the woman.`);
+ // Camera anchor is resolved before physical camera axes. A true male POV derives physical camera position and height from the man's resolved eyes.
+ if(s.camera.anchor.mode==='ai')a.push("Choose whether the viewpoint behaves as an independent editorial camera or a credible first-person viewpoint from the adult man's eyes; do not alter any other explicit scene setting.");
+ else if(s.camera.anchor.value==='man_pov'){
+   a.push("Use a credible first-person POV from the adult man's eye position: place the camera at or immediately adjacent to his resolved eye point, using his resolved pose and position relative to the woman to determine the physical camera height and horizontal location. Do not show his face or head as if the camera were observing him from outside; incidental edge fragments of his body are acceptable only when naturally visible from his own viewpoint.");
+   if(s.man.direction.mode==='direct'&&s.man.direction.value==='not_toward')a.push("His torso may remain not directly oriented toward her, but treat this photograph as the moment his head and eyes turn naturally enough toward the woman to establish the selected POV without rotating his whole body.");
+ }
+ // Compile camera axes independently. In male POV, horizontal position and height are physically derived from his eyes rather than duplicated as woman-relative absolute coordinates.
+ if(s.camera.anchor.mode==='ai'||s.camera.anchor.value!=='man_pov'){
+   if(s.camera.horizontalAngle.mode==='ai')a.push('Choose only the horizontal camera position naturally; preserve explicit camera height, tilt, framing and woman body orientation.');
+   else {const ca=+s.camera.horizontalAngle.value;a.push(ca===0?'Position the camera directly in front of the woman.':`Position the camera approximately ${Math.abs(ca)} degrees to the woman's ${ca<0?'left':'right'}.`);}
+   if(s.camera.height.mode==='ai')a.push('Choose only the camera height naturally, using the woman as the height reference; preserve explicit horizontal camera position and tilt.');
+   else a.push(`Set the camera height at ${txt(OPT.height,s.camera.height.value)} relative to the woman.`);
+ }
  if(s.camera.tilt.mode==='ai')a.push('Choose only the vertical optical-axis tilt naturally; preserve explicit camera position and height.');
  else {const ct=+s.camera.tilt.value;a.push(ct===0?'Keep the optical axis horizontal at 0 degrees of vertical tilt.':`Tilt the optical axis approximately ${Math.abs(ct)} degrees ${ct>0?'upward':'downward'}.`);}
  const persp={strong:'Use pronounced photographic perspective with strongly emphasized near-to-far size relationships.',moderate:'Use moderately emphasized photographic spatial depth.',natural:'Use balanced, natural photographic spatial proportions.',compressed:'Use mildly compressed photographic spatial relationships.',strong_compressed:'Use strongly compressed spatial relationships with reduced apparent depth.'};
@@ -324,7 +349,7 @@ function compile(s){let a=[];
  a.push("Preserve the woman's visual priority and the exact selected physical actions. Do not invent violence, pain, fear, punishment or humiliation that was not specified.");return cleanupPrompt(a)}
 function cleanupPrompt(parts){const seen=new Set(),out=[];for(const raw of parts.filter(Boolean)){const t=raw.trim().replace(/\s+/g,' ');if(!t)continue;const key=t.toLowerCase();if(seen.has(key))continue;seen.add(key);out.push(t)}return out.join('\n\n')}
 
-const FIELD_LABELS={personality:'성격',expression:'순간 표정',intensity:'표정 강도',head:'머리 / 턱 각도',faceDirection:'얼굴 방향',gaze:'시선',bodyPose:'몸 / 다리 자세',handAction:'손 / 팔 동작',bodyDirection:'몸 방향',representation:'남성 표현 방식',manPose:'남성 자세',manDirection:'남성 방향',relative:'여성 기준 상대 위치',distance:'두 사람의 거리',framing:'프레이밍',cameraAngle:'카메라 수평 위치',height:'카메라 높이',tilt:'카메라 수직 틸트',perspective:'원근감',frameX:'여성의 가로 위치',focus:'초점 대상',distanceAdjust:'카메라 거리 조정',frameXAdjust:'가로 위치 조정',frameYAdjust:'세로 위치 조정',blurAdjust:'흐림 / 심도 조정'};
+const FIELD_LABELS={cameraAnchor:'카메라 기준점',personality:'성격',expression:'순간 표정',intensity:'표정 강도',head:'머리 / 턱 각도',faceDirection:'얼굴 방향',gaze:'시선',bodyPose:'몸 / 다리 자세',handAction:'손 / 팔 동작',bodyDirection:'몸 방향',representation:'남성 표현 방식',manPose:'남성 자세',manDirection:'남성 방향',relative:'여성 기준 상대 위치',distance:'두 사람의 거리',framing:'프레이밍',cameraAngle:'카메라 수평 위치',height:'카메라 높이',tilt:'카메라 수직 틸트',perspective:'원근감',frameX:'여성의 가로 위치',focus:'초점 대상',distanceAdjust:'카메라 거리 조정',frameXAdjust:'가로 위치 조정',frameYAdjust:'세로 위치 조정',blurAdjust:'흐림 / 심도 조정'};
 function optionLabel(v){for(const arr of Object.values(OPT)){const hit=arr.find(x=>x[0]===String(v));if(hit)return hit[1]}for(const arr of [angle,tilt,bodyAngle]){const hit=arr.find(x=>x[0]===String(v));if(hit)return hit[1]}return String(v)}
 function randomSummary(s){const rows=[];function walk(o){if(!o||typeof o!=='object')return;for(const [k,v] of Object.entries(o)){if(v&&typeof v==='object'&&v.mode==='random'&&'value'in v){rows.push(`${FIELD_LABELS[k]||k}: ${optionLabel(v.value)}`)}else if(v&&typeof v==='object'&&!Array.isArray(v))walk(v)}}walk(s);return [...new Set(rows)]}
 function summarize(s){const cv=s.interaction.contactVisible===null?'AI 자동/미확정':s.interaction.contactVisible?'예':'아니오';const cx=s.composition.frameXAdjust.mode==='ai'?'AI 자동':(s.composition.resolvedXAdjust??s.composition.frameXAdjust.value),cy=s.composition.frameYAdjust.mode==='ai'?'AI 자동':(s.composition.resolvedYAdjust??s.composition.frameYAdjust.value);return `상태: ${s.status}\n보정 점수: ${s.score}\n접촉 존재: ${s.interaction.contactExists?'예':'아니오'}\n접촉 화면 표시: ${cv}\n프레임 이동 해결값: X ${cx}, Y ${cy}\n초점 해결값: ${s.focus.resolved}\n${s.corrections.length?'\n보정:\n- '+s.corrections.map(c=>`[${c.severity}] ${c.message}`).join('\n- '):''}`}
