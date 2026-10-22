@@ -2,15 +2,55 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Editorial Prompt Studio v1</title>
+<title>Editorial Prompt Studio · Photo Style 통합 v1</title>
 <style>
 :root{--bg:#f4f2ee;--panel:#fff;--ink:#181818;--muted:#6d6a66;--line:#d9d4cc;--accent:#24211f;--soft:#ece8e1;--warn:#8b4c22}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Noto Sans KR",sans-serif}.app{max-width:1500px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:18px}.top h1{margin:0;font-size:28px;letter-spacing:-.03em}.top p{margin:6px 0 0;color:var(--muted);font-size:13px}.badge{font-size:12px;border:1px solid var(--line);padding:7px 10px;border-radius:999px;background:#fff}.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(360px,.9fr);gap:18px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 5px 22px rgba(0,0,0,.035)}.controls{padding:18px}.output{padding:18px;position:sticky;top:16px;height:calc(100vh - 32px);display:flex;flex-direction:column}.section{border-top:1px solid var(--line);padding-top:16px;margin-top:16px}.section:first-child{border-top:0;margin-top:0;padding-top:0}.section h2{font-size:15px;margin:0 0 12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}.field small{display:block;color:var(--muted);font-size:11px;margin-top:5px;line-height:1.35}select,input[type=text],textarea{width:100%;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);padding:9px 10px;font:inherit}select{font-size:13px} select:disabled{background:#f1f1f1;color:#999;cursor:not-allowed;opacity:.72}textarea{resize:vertical}.rangeRow{display:grid;grid-template-columns:1fr 54px;gap:8px;align-items:center}.rangeRow input[type=range]{width:100%}.value{font-size:12px;text-align:center;background:var(--soft);padding:5px;border-radius:7px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}button{border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:9px;padding:9px 13px;font-weight:700;cursor:pointer}button.secondary{background:#fff;color:var(--ink);border-color:var(--line)}#prompt{flex:1;min-height:320px;line-height:1.55;font-size:13px}.status{font-size:12px;color:var(--muted);margin:8px 0 12px}.status.warn{color:var(--warn)}.randomResult{display:none;margin-top:12px;padding:10px 12px;background:#f7f5f1;border:1px solid var(--line);border-radius:10px;font-size:12px;line-height:1.5}.randomResult.show{display:block}.randomResult b{display:block;margin-bottom:4px}.diag{margin-top:10px;border:1px solid var(--line);border-radius:10px;background:#faf9f7}.diag summary{cursor:pointer;padding:9px 11px;font-size:12px;font-weight:700;color:var(--muted);user-select:none}.resolved{margin:0;padding:0 11px 11px;background:transparent;border-radius:0;font-size:11px;color:var(--muted);max-height:150px;overflow:auto;white-space:pre-wrap}.full{grid-column:1/-1}@media(max-width:900px){.layout{grid-template-columns:1fr}.output{position:static;height:auto}.grid{grid-template-columns:1fr}#prompt{min-height:420px}}
+
+.layout{grid-template-columns:minmax(0,1.18fr) minmax(290px,.83fr) minmax(320px,1fr);align-items:start}
+.advanced-panel{padding:18px}.advanced-panel>h2{font-size:16px;margin:0 0 15px}.advanced-panel .section:first-child{border-top:0;margin-top:0;padding-top:0}
+.output{height:calc(100vh - 32px)}.style-control{border-bottom:1px solid var(--line);padding:11px 0}.style-control:last-child{border-bottom:0}.style-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.style-head label{font-size:12px;font-weight:750}.style-head select{width:auto;max-width:112px;font-size:11px;padding:5px}.style-control select.style-value{width:100%}.style-control input[type=range]{width:100%;accent-color:#66594d}.style-selected{font-size:12px;font-weight:700;margin:6px 0}.style-desc{font-size:11px;color:var(--muted);line-height:1.5;margin:5px 0}.style-swatches{display:grid;grid-template-columns:1fr 1fr;gap:7px}.style-palette{background:#fff;color:var(--ink);border:1px solid var(--line);padding:7px;border-radius:9px;text-align:left;font-size:11px;font-weight:650}.style-palette.chosen{outline:2px solid #75634e}.style-colors{display:flex;gap:2px;height:21px;margin-bottom:5px}.style-colors i{flex:1;border-radius:3px}.style-warning{font-size:11px;color:var(--warn);background:#fff3e9;padding:7px;border-radius:7px}.style-section-title{font-size:14px;margin:16px 0 6px}.field.explained small{margin-top:5px}.advanced-panel .grid{grid-template-columns:1fr}
+@media(max-width:1250px){.layout{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.output{grid-column:1/-1;position:static;height:auto}#prompt{min-height:300px}}
+@media(max-width:720px){.layout{grid-template-columns:1fr}.output{grid-column:auto}.app{padding:12px}}
+
+/* Dark editorial theme — presentation only; generation logic unchanged */
+:root{color-scheme:dark;--bg:#0d1119;--panel:#171e2b;--ink:#edf2fa;--muted:#a1adbe;--line:#354154;--accent:#547bb7;--soft:#253248;--warn:#f3b37d}
+body{background:var(--bg);color:var(--ink)}
+.panel{box-shadow:0 10px 34px rgba(0,0,0,.22)}
+.top h1{color:#f3f6fc}.badge{background:#222e42;color:#cbd9ef;border-color:#40516a}
+select,input[type=text],textarea{background:#101725;color:var(--ink);border-color:#46546b}
+select:focus,input:focus,textarea:focus,button:focus-visible{outline:2px solid #8cb8ff;outline-offset:2px}
+select:disabled,input:disabled,textarea:disabled{background:#202938;color:#7e8b9e;opacity:.75}
+button{background:#416ba9;border-color:#547fbc;color:#fff}
+button:hover{filter:brightness(1.12)}
+button.secondary{background:#222e42;color:#e8effb;border-color:#495b73}
+.value{background:#29374b;color:#dce9ff}
+.status.warn{color:#f1ae77}
+.randomResult{background:#1e293a;border-color:var(--line)}
+.diag{background:#121b29;border-color:var(--line)}
+.resolved{color:#b3c0d1}
+.style-palette{background:#182335;color:#eaf1fb;border-color:#43536b}
+.style-palette.chosen{outline:2px solid #91b9f5;background:#253650}
+.style-control input[type=range],.rangeRow input[type=range]{accent-color:#82b0f5}
+.style-warning{background:#382b29;color:#ffca9f;border:1px solid #68473c}
+.style-selected{color:#c9dcfb}
+#prompt{background:#101725;color:#f0f5fd}
+::placeholder{color:#7f90a7;opacity:1}
+
+
+/* Shared cross-page navigation for GitHub Pages */
+.site-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:1500px;margin:0 auto;padding:14px 24px 0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
+.site-nav-title{font-size:12px;font-weight:700;letter-spacing:.05em;color:#9dacbf}
+.site-nav-links{display:flex;gap:8px;flex-wrap:wrap}
+.site-nav-links a{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 14px;border:1px solid #45536a;border-radius:10px;background:#1a2536;color:#d6e4f7;font-size:13px;font-weight:700;text-decoration:none;transition:background .15s,border-color .15s}
+.site-nav-links a:hover{background:#293b55;border-color:#779bca}
+.site-nav-links a[aria-current="page"]{background:#426ca8;color:#fff;border-color:#7299d1;cursor:default}
+@media(max-width:650px){.site-nav{padding:12px 12px 0}.site-nav-links{width:100%}.site-nav-links a{flex:1;text-align:center;font-size:12px}}
 </style>
 </head>
-<body><div class="app">
-<div class="top"><div><h1>EDITORIAL PROMPT STUDIO</h1><p>Adult high-fashion editorial · rule-based standalone v1</p></div><div class="badge">AI 없이 작동 · GitHub Pages 가능</div></div>
-<div class="layout"><div class="panel controls" id="controls"></div><div class="panel output">
+<body><nav class="site-nav" aria-label="생성기 페이지 이동"><span class="site-nav-title">PROMPT STUDIO</span><div class="site-nav-links"><a href="index.html" aria-current="page">통합 생성기</a><a href="photo_style.html">사진 스타일 전용</a></div></nav><div class="app">
+<div class="top"><div><h1>EDITORIAL PROMPT STUDIO</h1><p>장면·인물 + 사진 스타일 · 단일 HTML 통합 v1</p></div><div class="badge">AI 없이 작동 · GitHub Pages 가능</div></div>
+<div class="layout"><div class="panel controls" id="controls"></div><div class="panel controls advanced-panel"><h2>고급 설정 <small style="font-weight:400;color:var(--muted)">· 초기 AI 자동</small></h2><div id="advancedCamera"></div><div id="styleAdvanced"></div></div><div class="panel output">
 <div class="actions"><button id="generate">프롬프트 생성</button><button class="secondary" id="copy">복사</button><button class="secondary" id="reset">초기화</button></div>
 <div id="status" class="status">설정을 선택한 뒤 프롬프트를 생성하세요. 생성 후 아래 문장은 자유롭게 수정할 수 있습니다.</div>
 <textarea id="prompt" placeholder="Generated prompt appears here..."></textarea>
@@ -29,7 +69,7 @@ midPose:[['edge','정면 기본 걸터앉기'],['one_side_weight','한쪽 다리
 highPose:[['hang','양다리 자연스럽게 아래로 늘어뜨리기'],['asym_hang','한쪽 다리를 더 길게 내려뜨리기'],['one_leg_air','한쪽 무릎을 펴고 공중에서 정면으로 길게 뻗기'],['ankle_cross_air','공중에서 발목 교차하기'],['one_knee_up','한쪽 무릎을 몸 가까이 끌어올려 앉기'],['knees_wide_hang','양 무릎을 넓게 두고 다리를 아래로 늘어뜨리기'],['slight_forward','살짝 앞으로 기울이기'],['deep_forward','깊게 앞으로 숙이기'],['leg_to_man','한쪽 다리를 아래의 상대 방향으로 내밀기'],['both_knees_up','양 무릎을 몸 가까이 끌어올려 앉기'],['one_up_other_folded','한쪽 무릎 세우고 반대쪽 다리를 플랫폼 위에서 옆으로 느슨하게 접기']],
 standHands:[['arms_down','양팔 자연스럽게 내리기'],['one_waist','한 손 허리에 얹기'],['both_waist','양손 허리에 얹기'],['folded','팔짱 끼기'],['point_down','손가락으로 아래를 가리키기'],['stop_palm','손바닥으로 정지시키기'],['beckon','검지로 가까이 오라고 부르기'],['shoulder','어깨를 잡아 위치시키기'],['wrist','손목을 잡아 위치시키기'],['collar_one','옷깃을 한 손으로 움켜잡기'],['collar_both','양쪽 옷깃을 잡기'],['chin_index','검지로 턱끝 들어 올리기'],['chin_hand','손으로 턱을 감싸 들어 올리기'],['both_cheeks','한 손으로 양볼 감싸 잡기'],['cheek_pinch','엄지와 검지로 한쪽 볼 집기'],['cheek_press','검지로 볼 가볍게 누르기'],['head_stroke','머리 쓰다듬기'],['head_rest','머리 위에 손 얹어두기'],['occiput','뒤통수를 감싸 얼굴 방향 유도하기'],['forehead','이마에 검지를 대고 가볍게 거리 유지하기']],
 sitHands:[['hands_thighs','양손을 허벅지 위에 편하게 두기'],['one_thigh','한 손을 허벅지/무릎 위에 두기'],['folded','팔짱 끼기'],['one_elbow_knee','한쪽 팔꿈치를 무릎에 올리기'],['both_elbows_knees','양쪽 팔꿈치를 각각 무릎에 올리기'],['hug_one_knee','한쪽 무릎을 양팔로 느슨하게 감싸기'],['hug_both_knees','양 무릎을 양팔로 감싸기'],['seat_edge','양손으로 좌석 가장자리 짚기'],['beckon','검지로 가까이 오라고 부르기'],['point_down','손가락으로 자신의 앞/아래를 가리키기'],['stop_palm','손바닥을 내밀어 멈추게 하기'],['shoulder','상대 어깨를 잡아 위치시키기'],['wrist','상대 손목을 잡아 위치시키기'],['collar_one','한 손으로 옷깃을 움켜잡아 가까이 유도하기'],['chin_index','검지로 턱끝을 들어 올리기'],['chin_hand','손으로 턱을 감싸 얼굴 들어 올리기'],['cheek_pinch','엄지와 검지로 한쪽 볼 집기'],['both_cheeks','한 손으로 양볼 감싸 잡기'],['head_stroke','머리 쓰다듬기'],['head_rest','머리 위에 손을 얹은 채 바라보기'],['extend_hand','상대에게 한 손을 내밀기']],
-representation:[['silhouette','실루엣'],['visible','실제 등장']],
+representation:[['silhouette','실루엣'],['visible','실제 등장'],['pov','남성 1인칭 시점']],
 manPose:[['kneel_upright','양 무릎 + 상체 곧게'],['kneel_slight','양 무릎 + 상체 살짝 숙임'],['kneel_head_down','양 무릎 + 고개 숙임'],['kneel_deep','양 무릎 + 상체 깊게 숙임'],['kneel_heels','뒤꿈치 쪽으로 낮게 앉기'],['low_upright','낮게 앉아 상체 곧게'],['low_slight','낮게 앉아 상체 살짝 앞으로'],['stand_upright','곧게 서기'],['stand_slight','상체 살짝 숙여 서기'],['stand_head_down','고개 숙이고 서기'],['stand_deep','상체 깊게 숙여 서기'],['stand_shoulders_in','양어깨를 약간 안쪽으로'],['stand_hands_back','양손을 등 뒤로']],
 manDirection:[['toward','여성을 향함'],['not_toward','여성을 향하지 않음']],
 relative:[['front','정면'],['front_left','왼쪽 앞'],['front_right','오른쪽 앞'],['left','왼쪽 옆'],['right','오른쪽 옆'],['rear','뒤쪽']],
@@ -41,8 +81,7 @@ framing:[['face','얼굴 클로즈업'],['upper','상반신 클로즈업'],['wai
 height:[['3','머리보다 확실히 위'],['2','이마/머리 높이'],['1','눈보다 약간 위'],['0','눈높이'],['-1','가슴 높이'],['-2','허리/골반 높이'],['-3','허벅지/무릎 높이'],['-4','바닥 가까이']],
 perspective:[['strong','강한 원근감'],['moderate','약간 강한 원근감'],['natural','자연스러운 원근감'],['compressed','약간 압축된 원근감'],['strong_compressed','강하게 압축된 원근감']],
 frameX:[['far_left','극좌측'],['left','좌측'],['left_third','좌측 1/3'],['center','중앙'],['right_third','우측 1/3'],['right','우측'],['far_right','극우측']],
-focus:[['woman','여성 중심'],['face','여성 얼굴 최우선'],['contact','여성 + 접촉부위'],['both','두 사람 모두'],['scene','전체 장면']],
-cameraAnchor:[['independent','독립 카메라'],['man_pov','남성 시점 (POV)']]
+focus:[['woman','여성 중심'],['face','여성 얼굴 최우선'],['contact','여성 + 접촉부위'],['both','두 사람 모두'],['scene','전체 장면']]
 };
 const modeOpts='<option value="direct">직접선택</option><option value="random">랜덤</option><option value="ai">AI 자동</option>';
 function sel(id,label,opts,def,allowMode=true){return `<div class="field"><label>${label}</label>${allowMode?`<select data-mode="${id}">${modeOpts}</select>`:''}<select id="${id}">${opts.map(o=>`<option value="${o[0]}" ${o[0]===def?'selected':''}>${o[1]}</option>`).join('')}</select></div>`}
@@ -54,30 +93,34 @@ const bodyAngle=[];for(let a=-180;a<=180;a+=15)bodyAngle.push([String(a),a===0?'
 function render(){document.querySelector('#controls').innerHTML=`
 <section class="section"><h2>여성 · 얼굴</h2><div class="grid">${sel('personality','성격',OPT.personality,'calm')}${sel('expression','순간 표정',OPT.expression,'neutral')}${sel('intensity','표정 강도',OPT.intensity,'clear')}${sel('head','머리 / 턱 각도',OPT.head,'neutral')}${sel('faceDirection','얼굴 방향',OPT.faceDirection,'follow_body')}${sel('gaze','시선',OPT.gaze,'camera')}</div></section>
 <section class="section"><h2>여성 · 자세</h2><div class="grid">${sel('poseMode','자세 유형',OPT.poseMode,'standing',false)}${sel('seatType','앉는 위치',OPT.seatType,'chair',false)}<div id="poseSlot"></div><div id="handsSlot"></div>${sel('bodyDirection','몸 방향',bodyAngle,'0')}</div></section>
-<section class="section"><h2>남성 / 관계</h2><div class="grid">${sel('representation','남성 표현 방식',OPT.representation,'visible')}${sel('manPose','남성 자세',OPT.manPose,'kneel_upright')}${sel('manDirection','남성 방향',OPT.manDirection,'toward')}${sel('relative','여성 기준 상대 위치',OPT.relative,'front')}${sel('distance','두 사람의 거리',OPT.distance,'arm_reach')}</div></section>
-<section class="section"><h2>카메라</h2><div class="grid">${sel('cameraAnchor','카메라 기준점',OPT.cameraAnchor,'independent')}${sel('framing','프레이밍',OPT.framing,'mid_thigh')}${rangeMode('distanceAdjust','카메라 거리 조정',-50,50,0,'direct')}${sel('cameraAngle','카메라 수평 위치',angle,'0')}${sel('height','카메라 높이',OPT.height,'0')}${sel('tilt','카메라 수직 틸트',tilt,'0')}${sel('perspective','원근감',OPT.perspective,'natural')}</div></section>
-<section class="section"><h2>프레임 구성 / 초점</h2><div class="grid">${sel('frameX','여성의 가로 위치',OPT.frameX,'center')}${rangeMode('frameXAdjust','가로 위치 조정',-50,50,0,'direct')}${rangeMode('frameYAdjust','세로 위치 조정',-50,50,0,'ai')}${sel('focus','초점 대상',OPT.focus,'woman')}${rangeMode('blurAdjust','흐림 / 심도 조정',-50,50,0,'ai')}</div></section>
-<section class="section"><h2>자유 입력</h2><div class="grid"><div class="field full"><label>의상</label><textarea id="outfit" rows="2"></textarea></div><div class="field full"><label>배경</label><textarea id="background" rows="2"></textarea></div><div class="field full"><label>추가 프롬프트</label><textarea id="extra" rows="3"></textarea></div></div></section>`;
-updatePoseSlots();document.querySelector('#poseMode').onchange=updatePoseSlots;document.querySelector('#seatType').onchange=updatePoseSlots;
+<section class="section"><h2>남성 / 관계</h2><div class="grid">${sel('representation','남성 표현 방식',OPT.representation,'visible')}<div class="field" id="povHeightField" style="display:none"><label>1인칭 눈높이</label><select id="povHeight"><option value="auto">AI 자동</option><option value="standing">서 있는 눈높이</option><option value="seated">앉은 눈높이</option><option value="low">낮은 눈높이</option></select><small>보이지 않는 남성의 자세 대신 카메라 눈높이만 지정합니다.</small></div>${sel('manPose','남성 자세',OPT.manPose,'kneel_upright')}${sel('manDirection','남성 방향',OPT.manDirection,'toward')}${sel('relative','여성 기준 상대 위치',OPT.relative,'front')}${sel('distance','두 사람의 거리',OPT.distance,'arm_reach')}</div></section>
+<section class="section"><h2>카메라</h2><div class="grid">${sel('framing','프레이밍',OPT.framing,'mid_thigh')}${rangeMode('distanceAdjust','카메라 거리 조정',-50,50,0,'direct')}${sel('cameraAngle','카메라 수평 위치',angle,'0')}${sel('height','카메라 높이',OPT.height,'0')}${sel('tilt','카메라 수직 틸트',tilt,'0')}${sel('perspective','원근감',OPT.perspective,'natural')}</div></section>
+<section class="section"><h2>프레임 구성 / 초점</h2><div class="grid">${sel('frameX','여성의 가로 위치',OPT.frameX,'center')}${rangeMode('frameXAdjust','가로 위치 조정',-50,50,0,'direct')}${rangeMode('frameYAdjust','세로 위치 조정',-50,50,0,'ai')}${sel('focus','초점 대상',OPT.focus,'woman')}</div></section>
+<section class="section"><h2>사진 스타일 · 조명 / 색감 / 질감</h2><div id="styleBasic"></div></section>
+ <section class="section"><h2>자유 입력</h2><div class="grid"><div class="field full"><label>의상</label><textarea id="outfit" rows="2"></textarea></div><div class="field full"><label>배경</label><textarea id="background" rows="2"></textarea></div><div class="field full"><label>추가 프롬프트</label><textarea id="extra" rows="3"></textarea></div></div></section>`;
+document.querySelector('#controls').insertAdjacentHTML('beforeend', '<div style="display:none">'+rangeMode('blurAdjust','기존 심도 호환',-50,50,0,'ai')+'</div>');
+ updatePoseSlots();document.querySelector('#poseMode').onchange=updatePoseSlots;document.querySelector('#seatType').onchange=updatePoseSlots;
 ['distanceAdjust','frameXAdjust','frameYAdjust','blurAdjust'].forEach(id=>document.querySelector('#'+id).oninput=e=>document.querySelector('#'+id+'V').textContent=e.target.value);
 bindModeControls();
-bindCameraAnchor();
+ const povNote=document.createElement('div');povNote.id='povNote';povNote.className='style-warning';povNote.textContent='1인칭에서는 남성 자세·위치·방향과 기존 카메라 높이·각도를 출력하지 않습니다. 기존 선택값은 보존되며, 접촉 가시성은 별도 경고합니다.';document.getElementById('povHeightField').after(povNote);
+ bindPOVControls();
 }
 function bindModeControls(){document.querySelectorAll('select[data-mode]').forEach(modeEl=>{const id=modeEl.dataset.mode;const sync=()=>{const valueEl=document.querySelector('#'+id);if(valueEl)valueEl.disabled=modeEl.value!=='direct';};modeEl.onchange=sync;sync();});}
-
-function bindCameraAnchor(){
- const modeEl=document.querySelector('[data-mode="cameraAnchor"]'), valueEl=document.querySelector('#cameraAnchor');
- if(!modeEl||!valueEl)return;
+function bindPOVControls(){
+ const rep=document.getElementById('representation'),mode=document.querySelector('[data-mode="representation"]');
  const sync=()=>{
-   const pov=modeEl.value!=='ai'&&valueEl.value==='man_pov';
-   for(const id of ['cameraAngle','height']){
-     const m=document.querySelector(`[data-mode="${id}"]`),v=document.querySelector('#'+id);
-     if(m)m.disabled=pov;
-     if(v)v.disabled=pov||(!m?false:m.value!=='direct');
+   const active=mode.value==='direct'&&rep.value==='pov';
+   const field=document.getElementById('povHeightField');field.style.display=active?'block':'none';
+   for(const id of ['manPose','manDirection','relative','distance','height','cameraAngle','tilt','distanceAdjust']){
+     const el=document.getElementById(id),wrap=el?.closest('.field');if(!wrap)continue;
+     wrap.style.display=active?'none':'';
    }
-   valueEl.title=pov?'남성의 실제 눈 위치가 카메라의 수평 위치와 높이를 결정합니다.':'';
+   const note=document.getElementById('povNote');if(note)note.style.display=active?'block':'none';
  };
- modeEl.addEventListener('change',sync);valueEl.addEventListener('change',sync);sync();
+ const oldRep=rep.onchange,oldMode=mode.onchange;
+ rep.onchange=e=>{if(oldRep)oldRep(e);sync()};
+ mode.onchange=e=>{if(oldMode)oldMode(e);sync()};
+ sync();
 }
 function updatePoseSlots(){const sit=document.querySelector('#poseMode').value==='sitting';document.querySelector('#seatType').closest('.field').style.display=sit?'block':'none';let po=OPT.standingPose,ha=OPT.standHands;if(sit){const t=document.querySelector('#seatType').value;po=t==='chair'?OPT.chairPose:t==='mid'?OPT.midPose:OPT.highPose;ha=OPT.sitHands}document.querySelector('#poseSlot').innerHTML=sel('bodyPose','몸 / 다리 자세',po,po[0][0]);document.querySelector('#handsSlot').innerHTML=sel('handAction','손 / 팔 동작',ha,ha[0][0]);bindModeControls();}
 const CONTACT=new Set(['shoulder','wrist','collar_one','collar_both','chin_index','chin_hand','both_cheeks','cheek_pinch','cheek_press','head_stroke','head_rest','occiput','forehead']);
@@ -125,7 +168,7 @@ function resolveContactVisibility(s,contact,region){
  return visible;
 }
 function weightedRandom(arr){if(!arr.length)return null;return arr[Math.floor(Math.random()*arr.length)]}
-function candidateValues(id,ctx){const el=document.querySelector('#'+id);let arr=[...el.options].map(o=>o.value);if(id==='handAction'&&ctx?.distance==='separated'){const allowed=ctx.poseMode==='standing'?NONCONTACT_STAND:NONCONTACT_SIT;arr=arr.filter(v=>allowed.includes(v));}if(id==='handAction'&&ctx?.fixedSilhouette){arr=arr.filter(v=>!CONTACT.has(v));}if(id==='handAction'&&ctx?.poseMode==='sitting'){if(!ONE_KNEE_RAISED.has(ctx.bodyPose))arr=arr.filter(v=>v!=='hug_one_knee');if(!BOTH_KNEES_RAISED.has(ctx.bodyPose))arr=arr.filter(v=>v!=='hug_both_knees');}if(id==='representation'&&ctx?.precisionContact)arr=arr.filter(v=>v!=='silhouette');return arr}
+function candidateValues(id,ctx){const el=document.querySelector('#'+id);let arr=[...el.options].map(o=>o.value);if(id==='handAction'&&ctx?.distance==='separated'){const allowed=ctx.poseMode==='standing'?NONCONTACT_STAND:NONCONTACT_SIT;arr=arr.filter(v=>allowed.includes(v));}if(id==='handAction'&&ctx?.fixedSilhouette){arr=arr.filter(v=>!CONTACT.has(v));}if(id==='handAction'&&ctx?.poseMode==='sitting'){if(!ONE_KNEE_RAISED.has(ctx.bodyPose))arr=arr.filter(v=>v!=='hug_one_knee');if(!BOTH_KNEES_RAISED.has(ctx.bodyPose))arr=arr.filter(v=>v!=='hug_both_knees');}if(id==='representation'){arr=arr.filter(v=>v!=='pov');if(ctx?.precisionContact)arr=arr.filter(v=>v!=='silhouette');}return arr}
 function pick(id,ctx={}){const el=document.querySelector('#'+id), modeEl=document.querySelector(`[data-mode="${id}"]`);let mode=modeEl?modeEl.value:'direct', value=el.value;if(mode==='random'){const arr=candidateValues(id,ctx);value=weightedRandom(arr)??el.value}return {mode,value,resolved:mode!=='ai'}}
 function pickScalar(id,min=-50,max=50){const el=document.querySelector('#'+id),modeEl=document.querySelector(`[data-mode="${id}"]`);const mode=modeEl?modeEl.value:'direct';let value=+el.value;if(mode==='random')value=Math.floor(Math.random()*(max-min+1))+min;return {mode,value,resolved:mode!=='ai'}}
 function txt(opts,v){return (opts.find(x=>x[0]===v)||['',v])[1]}
@@ -179,11 +222,13 @@ function resolve(){
  let s={woman:{personality:pick('personality'),expression:pick('expression'),intensity:pick('intensity'),poseMode:{mode:'direct',value:poseMode},seatType:{mode:'direct',value:seatType},bodyPose:pick('bodyPose'),bodyDirection:pick('bodyDirection'),faceDirection:pick('faceDirection'),gaze:pick('gaze'),head:pick('head')},man:{},relationship:{distance:pick('distance')},camera:{},composition:{},focus:{},text:{outfit:val('outfit').trim(),background:val('background').trim(),extra:val('extra').trim()},corrections:[],warnings:[],score:0};
  const repModeEl=document.querySelector('[data-mode="representation"]');
  const fixedSilhouette=(!repModeEl||repModeEl.value==='direct')&&val('representation')==='silhouette';
- s.woman.handAction=pick('handAction',{distance:s.relationship.distance.mode==='ai'?null:s.relationship.distance.value,poseMode,bodyPose:s.woman.bodyPose.value,seatType,fixedSilhouette});
+ s.woman.handAction=pick('handAction',{distance:(document.getElementById('representation').value==='pov'&&document.querySelector('[data-mode="representation"]').value==='direct')?null:(s.relationship.distance.mode==='ai'?null:s.relationship.distance.value),poseMode,bodyPose:s.woman.bodyPose.value,seatType,fixedSilhouette});
  const precisionContact=CONTACT.has(s.woman.handAction.value)&&s.woman.handAction.mode!=='ai';
  s.man.representation=pick('representation',{precisionContact});
+ s.pov=s.man.representation.mode!=='ai'&&s.man.representation.value==='pov';
+ s.povHeight=s.pov?document.getElementById('povHeight').value:'auto';
  s.man.pose=pick('manPose');s.man.direction=pick('manDirection');s.man.relative=pick('relative');
- s.camera={anchor:pick('cameraAnchor'),framing:pick('framing'),distanceAdjust:pickScalar('distanceAdjust'),horizontalAngle:pick('cameraAngle'),height:pick('height'),tilt:pick('tilt'),perspective:pick('perspective')};
+ s.camera={framing:pick('framing'),distanceAdjust:pickScalar('distanceAdjust'),horizontalAngle:pick('cameraAngle'),height:pick('height'),tilt:pick('tilt'),perspective:pick('perspective')};
  s.composition={frameX:pick('frameX'),frameXAdjust:pickScalar('frameXAdjust'),frameYAdjust:pickScalar('frameYAdjust')};
  s.focus={target:pick('focus'),blurAdjust:pickScalar('blurAdjust')};
  const h=s.woman.handAction.value;let contact=s.woman.handAction.mode!=='ai'&&CONTACT.has(h);
@@ -193,7 +238,7 @@ function resolve(){
  s.relationship.resolvedDistance=s.relationship.requestedDistance;
  s.relationship.interactionReach=contact?'contact_reach':'none';
  // Distance and reach: direct contact survives; non-direct candidates are filtered/fallbacked.
- if(s.relationship.distance.mode!=='ai'&&s.relationship.distance.value==='separated'&&contact){
+ if(!s.pov&&s.relationship.distance.mode!=='ai'&&s.relationship.distance.value==='separated'&&contact){
    if(s.relationship.distance.mode==='direct'&&s.woman.handAction.mode==='direct'){
      s.relationship.resolvedDistance='minimum_reachable_separation';
      s.relationship.interactionReach='extended_contact';
@@ -204,7 +249,7 @@ function resolve(){
    }
  }
  // Accessibility by male pose and target. Preserve the woman's selected action and alter the man minimally first.
- if(contact&&s.man.pose.mode!=='ai'){
+ if(!s.pov&&contact&&s.man.pose.mode!=='ai'){
    const target=TARGET_CLASS[s.woman.handAction.value];
    const access=(ACCESS[s.man.pose.value]||{})[target]??2;
    s.interactionAccessibility={target,initial:access,resolved:access};
@@ -227,7 +272,8 @@ function resolve(){
  resolveCompositionShift(s);
  if(s.man.representation.mode==='direct'&&s.man.representation.value==='silhouette'&&contact){addCorrection(s,'실루엣 표현을 유지하되 선택한 접촉에 필요한 남성 신체부위만 식별 가능하게 표시',1,'silhouette_contact')}
  const region=contact?CONTACT_REGION[s.woman.handAction.value]:null;
- let contactVisible=resolveContactVisibility(s,contact,region);
+ let contactVisible=s.pov?null:resolveContactVisibility(s,contact,region);
+ if(s.pov&&contact)addCorrection(s,'1인칭 시점에서는 얼굴·옷깃 등 카메라 자체에 대한 접촉이 화면에 보인다고 보장할 수 없습니다. 선택 동작은 유지하며 가시성은 미확정으로 둡니다.',0,'pov_contact_visibility');
  s.interaction={...(s.interaction||{}),contactExists:contact,contactTarget:contact?s.woman.handAction.value:null,contactRegion:region,contactVisible,requiredHands:s.woman.requiredHands,accessibility:s.interactionAccessibility||null};
  if(s.focus.target.mode==='ai')s.focus.resolved='ai';
  else if(s.focus.target.value==='contact'&&contactVisible!==true){s.focus.resolved='woman';addCorrection(s,contact?(contactVisible===null?'접촉 가시성이 AI 프레이밍에 위임되어 있어 확정 접촉 초점 대신 여성 중심 초점으로 안전하게 해결':'접촉은 존재하지만 현재 여성 중심 크롭 밖으로 판정되어 초점을 여성 중심으로 해결'):'접촉 동작이 없어 초점을 여성 중심으로 해결',0,'focus_fallback');}
@@ -282,11 +328,12 @@ const MAN_DIR={toward:'His torso is oriented toward the woman.',not_toward:'His 
 function compile(s){let a=[];
  a.push('Photorealistic high-fashion editorial photograph of an adult woman as the primary visual and narrative subject, with an adult man participating in an established consensual fictional power dynamic. Treat this as an actual professional-camera photograph with realistic human anatomy, natural skin texture, physically credible hands and contact, realistic textiles, photographic lighting, lens behavior, depth of field and spatial perspective. Avoid CGI-like rendering, game-character aesthetics, illustration-like anatomy and artificial 2.5D appearance.');
  a.push("The woman remains the dominant visual focal point; the man's presence supports the interaction without competing with her visual prominence.");
- if(s.relationship.distance.mode==='ai')a.push('Choose only the body-to-body spacing naturally while preserving every explicit interaction, pose and relative-position setting.');
- else if(s.relationship.resolvedDistance==='contact')a.push('Keep the two adults at close contact distance.');
- else if(s.relationship.resolvedDistance==='arm_reach')a.push('Keep their bodies at approximately arm-reach distance.');
- else if(s.relationship.resolvedDistance==='separated')a.push('Keep a clearly separated body-to-body distance with no contact unless an explicit selected action requires otherwise.');
- else if(s.relationship.resolvedDistance==='minimum_reachable_separation')a.push('Keep their bodies visibly separated while reducing the gap only enough for the explicitly selected extended-arm contact to reach.');
+ if(s.pov){a.push('First-person photographic viewpoint from the other adult participant. The camera occupies his eye position; do not show his face, body, silhouette or a separate male figure. Keep the woman as the primary visible subject.');const h={standing:'at standing adult eye level',seated:'at seated adult eye level',low:'at a low eye level near a kneeling or crouched viewpoint'};if(s.povHeight==='auto')a.push('Choose a natural first-person eye level appropriate to the scene.');else a.push('Position the first-person camera '+h[s.povHeight]+'.');}
+ if(!s.pov&&s.relationship.distance.mode==='ai')a.push('Choose only the body-to-body spacing naturally while preserving every explicit interaction, pose and relative-position setting.');
+ else if(!s.pov&&s.relationship.resolvedDistance==='contact')a.push('Keep the two adults at close contact distance.');
+ else if(!s.pov&&s.relationship.resolvedDistance==='arm_reach')a.push('Keep their bodies at approximately arm-reach distance.');
+ else if(!s.pov&&s.relationship.resolvedDistance==='separated')a.push('Keep a clearly separated body-to-body distance with no contact unless an explicit selected action requires otherwise.');
+ else if(!s.pov&&s.relationship.resolvedDistance==='minimum_reachable_separation')a.push('Keep their bodies visibly separated while reducing the gap only enough for the explicitly selected extended-arm contact to reach.');
  a.push(poseText(s));
  // Body orientation is an independent axis from camera, face and gaze.
  if(s.woman.bodyDirection.mode==='ai'){
@@ -311,34 +358,28 @@ function compile(s){let a=[];
  const gaze={camera:'Her eyes look directly into the camera lens.',man:'Her eyes settle directly on the man.',down_man:'Her eyes angle downward toward the man when his resolved position is below her eye level.',part_man:'Her eyes focus on the visible interaction-relevant part of the man.',down:'Her eyes angle downward without necessarily fixing on the man.',side:'Her eyes shift sideways while her head remains comparatively still.',off:'Her gaze extends toward a point outside the frame.'};
  if(s.woman.gaze.mode==='ai')a.push('Allow only the eye direction to settle naturally within the established scene.');else a.push(gaze[s.woman.gaze.value]);
  // Compile every male axis independently so AI Auto on one axis never erases explicit values on another.
- if(s.man.relative.mode==='ai')a.push("Choose only the man's relative position naturally while preserving every explicit interaction and direction setting.");
+ if(s.pov){/* Male pose, placement and torso direction are intentionally not emitted in first person. */}
+ else if(s.man.relative.mode==='ai')a.push("Choose only the man's relative position naturally while preserving every explicit interaction and direction setting.");
  else a.push(`The adult man remains a secondary visual element ${MAN_REL[s.man.relative.value]}.`);
- if(s.man.pose.mode==='ai')a.push("Choose only the man's pose naturally as a secondary visual variable without changing his explicit relative position or torso orientation.");
- else a.push(MAN_POSE[s.man.pose.value]);
- if(s.man.direction.mode==='ai')a.push("Choose only the man's torso orientation naturally without changing his explicit pose or relative position.");
- else a.push(MAN_DIR[s.man.direction.value]);
- if(s.man.representation.mode==='ai')a.push("Choose only the man's degree of visual representation naturally while keeping him secondary to the woman and preserving any required contact anatomy.");
- else if(s.man.representation.value==='silhouette')a.push('Render him primarily as a softly defined secondary silhouette or partial presence; reveal only the anatomy necessary to make any selected precise contact intelligible.');
+ if(!s.pov&&s.man.pose.mode==='ai')a.push("Choose only the man's pose naturally as a secondary visual variable without changing his explicit relative position or torso orientation.");
+ else if(!s.pov)a.push(MAN_POSE[s.man.pose.value]);
+ if(!s.pov&&s.man.direction.mode==='ai')a.push("Choose only the man's torso orientation naturally without changing his explicit pose or relative position.");
+ else if(!s.pov)a.push(MAN_DIR[s.man.direction.value]);
+ if(!s.pov&&s.man.representation.mode==='ai')a.push("Choose only the man's degree of visual representation naturally while keeping him secondary to the woman and preserving any required contact anatomy.");
+ else if(!s.pov&&s.man.representation.value==='silhouette')a.push('Render him primarily as a softly defined secondary silhouette or partial presence; reveal only the anatomy necessary to make any selected precise contact intelligible.');
  const fr={face:'Frame her from the top of her head through her face, neck and a small amount of shoulder.',upper:'Frame her from the top of her head to the lower chest or rib area.',waist:'Frame her from the top of her head to approximately the waist.',mid_thigh:'Frame her from the top of her head to approximately mid-thigh.',above_knee:'Frame her from the top of her head to just above the knees.',full:'Show her complete body from head through both feet without cropping either.',wide_full:'Show her complete body from head through both feet with substantial surrounding environment and relational space.'};
  if(s.camera.framing.mode==='ai')a.push('Choose only the framing naturally while keeping the woman as the dominant subject.');else a.push(fr[s.camera.framing.value]);
- // Camera anchor is resolved before physical camera axes. A true male POV derives physical camera position and height from the man's resolved eyes.
- if(s.camera.anchor.mode==='ai')a.push("Choose whether the viewpoint behaves as an independent editorial camera or a credible first-person viewpoint from the adult man's eyes; do not alter any other explicit scene setting.");
- else if(s.camera.anchor.value==='man_pov'){
-   a.push("Use a credible first-person POV from the adult man's eye position: place the camera at or immediately adjacent to his resolved eye point, using his resolved pose and position relative to the woman to determine the physical camera height and horizontal location. Do not show his face or head as if the camera were observing him from outside; incidental edge fragments of his body are acceptable only when naturally visible from his own viewpoint.");
-   if(s.man.direction.mode==='direct'&&s.man.direction.value==='not_toward')a.push("His torso may remain not directly oriented toward her, but treat this photograph as the moment his head and eyes turn naturally enough toward the woman to establish the selected POV without rotating his whole body.");
- }
- // Compile camera axes independently. In male POV, horizontal position and height are physically derived from his eyes rather than duplicated as woman-relative absolute coordinates.
- if(s.camera.anchor.mode==='ai'||s.camera.anchor.value!=='man_pov'){
-   if(s.camera.horizontalAngle.mode==='ai')a.push('Choose only the horizontal camera position naturally; preserve explicit camera height, tilt, framing and woman body orientation.');
-   else {const ca=+s.camera.horizontalAngle.value;a.push(ca===0?'Position the camera directly in front of the woman.':`Position the camera approximately ${Math.abs(ca)} degrees to the woman's ${ca<0?'left':'right'}.`);}
-   if(s.camera.height.mode==='ai')a.push('Choose only the camera height naturally, using the woman as the height reference; preserve explicit horizontal camera position and tilt.');
-   else a.push(`Set the camera height at ${txt(OPT.height,s.camera.height.value)} relative to the woman.`);
- }
- if(s.camera.tilt.mode==='ai')a.push('Choose only the vertical optical-axis tilt naturally; preserve explicit camera position and height.');
- else {const ct=+s.camera.tilt.value;a.push(ct===0?'Keep the optical axis horizontal at 0 degrees of vertical tilt.':`Tilt the optical axis approximately ${Math.abs(ct)} degrees ${ct>0?'upward':'downward'}.`);}
+ // Compile camera axes independently. One delegated axis must never suppress explicit values on the others.
+ if(s.pov){a.push('Use the participant’s first-person viewing direction without an external camera angle.');}
+ else if(s.camera.horizontalAngle.mode==='ai')a.push('Choose only the horizontal camera position naturally; preserve explicit camera height, tilt, framing and woman body orientation.');
+ else {const ca=+s.camera.horizontalAngle.value;a.push(ca===0?'Position the camera directly in front of the woman.':`Position the camera approximately ${Math.abs(ca)} degrees to the woman's ${ca<0?'left':'right'}.`);}
+ if(!s.pov&&s.camera.height.mode==='ai')a.push('Choose only the camera height naturally, using the woman as the height reference; preserve explicit horizontal camera position and tilt.');
+ else if(!s.pov)a.push(`Set the camera height at ${txt(OPT.height,s.camera.height.value)} relative to the woman.`);
+ if(!s.pov&&s.camera.tilt.mode==='ai')a.push('Choose only the vertical optical-axis tilt naturally; preserve explicit camera position and height.');
+ else if(!s.pov){const ct=+s.camera.tilt.value;a.push(ct===0?'Keep the optical axis horizontal at 0 degrees of vertical tilt.':`Tilt the optical axis approximately ${Math.abs(ct)} degrees ${ct>0?'upward':'downward'}.`);}
  const persp={strong:'Use pronounced photographic perspective with strongly emphasized near-to-far size relationships.',moderate:'Use moderately emphasized photographic spatial depth.',natural:'Use balanced, natural photographic spatial proportions.',compressed:'Use mildly compressed photographic spatial relationships.',strong_compressed:'Use strongly compressed spatial relationships with reduced apparent depth.'};
  if(s.camera.perspective.mode==='ai')a.push('Choose only the perspective character naturally without changing the explicit framing, physical camera position, height or tilt.');else a.push(persp[s.camera.perspective.value]);
- if(s.camera.distanceAdjust.mode==='ai')a.push('Choose only the physical shooting distance naturally while preserving the selected framing and perspective character.');else {const d=s.camera.distanceAdjust.value;if(d===0)a.push('Use a standard physical shooting distance appropriate to the selected framing.');else a.push(`Use a ${Math.abs(d)>30?'substantially':'moderately'} ${d<0?'closer':'farther'} physical shooting distance while preserving the selected framing through an appropriate optical solution.`);}
+ if(!s.pov&&s.camera.distanceAdjust.mode==='ai')a.push('Choose only the physical shooting distance naturally while preserving the selected framing and perspective character.');else if(!s.pov){const d=s.camera.distanceAdjust.value;if(d===0)a.push('Use a standard physical shooting distance appropriate to the selected framing.');else a.push(`Use a ${Math.abs(d)>30?'substantially':'moderately'} ${d<0?'closer':'farther'} physical shooting distance while preserving the selected framing through an appropriate optical solution.`);}
  if(s.composition.frameX.mode==='ai')a.push('Choose only the woman’s horizontal placement naturally while preserving the selected body coverage and camera position.');else {const fx=txt(OPT.frameX,s.composition.frameX.value);a.push(`Place the woman around the ${fx} region of the frame while preserving the selected body coverage.`)}
  const rx=s.composition.resolvedXAdjust, ry=s.composition.resolvedYAdjust;
  if(s.composition.frameXAdjust.mode==='ai')a.push('Choose only the fine horizontal frame adjustment naturally without changing the selected base placement, camera position or body coverage.');else if(rx)a.push(`Shift that base placement ${Math.abs(rx)>30?'noticeably':'slightly'} toward frame-${rx<0?'left':'right'} without changing camera position or selected body coverage.`);
@@ -349,13 +390,98 @@ function compile(s){let a=[];
  a.push("Preserve the woman's visual priority and the exact selected physical actions. Do not invent violence, pain, fear, punishment or humiliation that was not specified.");return cleanupPrompt(a)}
 function cleanupPrompt(parts){const seen=new Set(),out=[];for(const raw of parts.filter(Boolean)){const t=raw.trim().replace(/\s+/g,' ');if(!t)continue;const key=t.toLowerCase();if(seen.has(key))continue;seen.add(key);out.push(t)}return out.join('\n\n')}
 
-const FIELD_LABELS={cameraAnchor:'카메라 기준점',personality:'성격',expression:'순간 표정',intensity:'표정 강도',head:'머리 / 턱 각도',faceDirection:'얼굴 방향',gaze:'시선',bodyPose:'몸 / 다리 자세',handAction:'손 / 팔 동작',bodyDirection:'몸 방향',representation:'남성 표현 방식',manPose:'남성 자세',manDirection:'남성 방향',relative:'여성 기준 상대 위치',distance:'두 사람의 거리',framing:'프레이밍',cameraAngle:'카메라 수평 위치',height:'카메라 높이',tilt:'카메라 수직 틸트',perspective:'원근감',frameX:'여성의 가로 위치',focus:'초점 대상',distanceAdjust:'카메라 거리 조정',frameXAdjust:'가로 위치 조정',frameYAdjust:'세로 위치 조정',blurAdjust:'흐림 / 심도 조정'};
+const FIELD_LABELS={personality:'성격',expression:'순간 표정',intensity:'표정 강도',head:'머리 / 턱 각도',faceDirection:'얼굴 방향',gaze:'시선',bodyPose:'몸 / 다리 자세',handAction:'손 / 팔 동작',bodyDirection:'몸 방향',representation:'남성 표현 방식',manPose:'남성 자세',manDirection:'남성 방향',relative:'여성 기준 상대 위치',distance:'두 사람의 거리',framing:'프레이밍',cameraAngle:'카메라 수평 위치',height:'카메라 높이',tilt:'카메라 수직 틸트',perspective:'원근감',frameX:'여성의 가로 위치',focus:'초점 대상',distanceAdjust:'카메라 거리 조정',frameXAdjust:'가로 위치 조정',frameYAdjust:'세로 위치 조정',blurAdjust:'흐림 / 심도 조정'};
 function optionLabel(v){for(const arr of Object.values(OPT)){const hit=arr.find(x=>x[0]===String(v));if(hit)return hit[1]}for(const arr of [angle,tilt,bodyAngle]){const hit=arr.find(x=>x[0]===String(v));if(hit)return hit[1]}return String(v)}
 function randomSummary(s){const rows=[];function walk(o){if(!o||typeof o!=='object')return;for(const [k,v] of Object.entries(o)){if(v&&typeof v==='object'&&v.mode==='random'&&'value'in v){rows.push(`${FIELD_LABELS[k]||k}: ${optionLabel(v.value)}`)}else if(v&&typeof v==='object'&&!Array.isArray(v))walk(v)}}walk(s);return [...new Set(rows)]}
-function summarize(s){const cv=s.interaction.contactVisible===null?'AI 자동/미확정':s.interaction.contactVisible?'예':'아니오';const cx=s.composition.frameXAdjust.mode==='ai'?'AI 자동':(s.composition.resolvedXAdjust??s.composition.frameXAdjust.value),cy=s.composition.frameYAdjust.mode==='ai'?'AI 자동':(s.composition.resolvedYAdjust??s.composition.frameYAdjust.value);return `상태: ${s.status}\n보정 점수: ${s.score}\n접촉 존재: ${s.interaction.contactExists?'예':'아니오'}\n접촉 화면 표시: ${cv}\n프레임 이동 해결값: X ${cx}, Y ${cy}\n초점 해결값: ${s.focus.resolved}\n${s.corrections.length?'\n보정:\n- '+s.corrections.map(c=>`[${c.severity}] ${c.message}`).join('\n- '):''}`}
+function summarize(s){const cv=s.interaction.contactVisible===null?'AI 자동/미확정':s.interaction.contactVisible?'예':'아니오';const cx=s.composition.frameXAdjust.mode==='ai'?'AI 자동':(s.composition.resolvedXAdjust??s.composition.frameXAdjust.value),cy=s.composition.frameYAdjust.mode==='ai'?'AI 자동':(s.composition.resolvedYAdjust??s.composition.frameYAdjust.value);return `시점: ${s.pov?'남성 1인칭 ('+s.povHeight+')':'기존 카메라'}\n상태: ${s.status}\n보정 점수: ${s.score}\n접촉 존재: ${s.interaction.contactExists?'예':'아니오'}\n접촉 화면 표시: ${cv}\n프레임 이동 해결값: X ${cx}, Y ${cy}\n초점 해결값: ${s.focus.resolved}\n${s.corrections.length?'\n보정:\n- '+s.corrections.map(c=>`[${c.severity}] ${c.message}`).join('\n- '):''}`}
+const stylePalette=[
+['neutral','뉴트럴','흰색·회색·베이지 중심',['#F0EDE7','#C8C4BE','#898781'],'중립적인 뉴트럴 팔레트, 절제된 무채색과 베이지 계열'],
+['earth','따뜻한 어스톤','베이지·갈색·올리브',['#D7B994','#A17C5A','#74734F'],'베이지·브라운·올리브 중심의 따뜻한 어스톤 팔레트'],
+['pastel','파스텔','연분홍·연하늘·연보라',['#E9C4D4','#BFDCEC','#D8C9EA'],'밝고 연한 파스텔 팔레트, 부드러운 분홍·하늘·보라 계열'],
+['blue','차가운 블루','파랑·청록 중심',['#B4D4DF','#5895AE','#365C7A'],'파랑과 청록 중심의 차가운 색상 팔레트'],
+['green','자연의 녹색','세이지·올리브·숲의 녹색',['#BBC6B2','#87966D','#435F4C'],'세이지·올리브·숲의 녹색 중심의 자연적인 색상 팔레트'],
+['vivid','강렬한 컬러','선명한 여러 색',['#E84956','#EFBB3C','#3975C8'],'다양한 선명한 색을 활용한 강렬한 컬러 팔레트'],
+['mono','흑백','색 없이 명암만 표현',['#20252B','#92979C','#E8E9EA'],'흑백 사진, 색상 없이 밝기와 명암으로만 표현']
+];
+const styleDefs=[
+{group:'카메라',id:'focal',name:'화각',type:'select',opts:[['wide','광각','넓은 범위를 담는 광각 렌즈 느낌'],['normal','표준','자연스러운 원근감의 표준 화각'],['tele','망원','좁은 화각, 망원 렌즈 특유의 배경 압축감']]},
+{group:'카메라',id:'distance',name:'촬영 거리',type:'select',opts:[['near','가까이','피사체에 가까운 촬영 거리'],['medium','보통','피사체와 적당한 거리를 둔 촬영'],['far','멀리','피사체에서 멀리 떨어진 촬영 거리']]},
+{group:'카메라',id:'blur',name:'배경 흐림',type:'scale',labels:['모두 선명','약한 흐림','보통','강한 흐림','매우 강한 흐림'],words:['피사체와 배경 모두 선명한 깊은 초점, 배경 디테일 유지','배경의 흐림이 매우 약함, 주변 환경이 또렷하게 식별됨','피사체는 선명하고 배경은 자연스럽게 흐려짐','피사체와 배경이 뚜렷이 분리됨, 강한 배경 흐림','배경의 형태가 크게 흐려지는 매우 얕은 심도, 강한 배경 보케']},
+{group:'조명',id:'source',name:'광원',type:'select',opts:[['natural','자연광','자연광'],['studio','스튜디오','스튜디오 조명'],['indoor','실내 조명','실내 인공조명'],['mixed','혼합광','서로 다른 광원이 섞인 혼합 조명']]},
+{group:'조명',id:'direction',name:'빛의 방향',type:'select',opts:[['front','정면','정면에서 비추는 빛'],['left','왼쪽','왼쪽에서 비추는 빛'],['right','오른쪽','오른쪽에서 비추는 빛'],['back','역광','피사체 뒤에서 비추는 역광'],['above','위쪽','위쪽에서 내려오는 빛']]},
+{group:'조명',id:'lightColor',name:'광원 색상',type:'select',opts:[['yellow','따뜻한 노란빛','따뜻한 황색 조명, 노란빛이 피사체에 닿음'],['white','중립적인 흰빛','중립적인 백색 조명, 색 치우침이 적은 빛'],['blue','차가운 푸른빛','차가운 청색 조명, 푸른빛이 피사체에 닿음'],['single','단색 컬러 조명','특정 한 가지 색의 컬러 조명'],['multi','여러 색의 조명','서로 다른 색의 빛이 장면을 비추는 다색 조명, 컬러 조명 효과']]},
+{group:'조명',id:'softness',name:'빛의 부드러움',type:'scale',labels:['매우 단단함','단단함','보통','부드러움','매우 부드러움'],words:['직접적이고 단단한 빛, 경계가 매우 선명한 그림자','비교적 단단한 빛, 뚜렷한 그림자 경계','적당한 확산광, 자연스러운 그림자 경계','넓게 확산된 부드러운 빛, 완만한 그림자 경계','매우 넓게 확산된 빛, 거의 구분되지 않는 부드러운 그림자 경계']},
+{group:'색감',id:'palette',name:'색조 계열',type:'palette'},
+{group:'색감',id:'warmth',name:'사진 전체의 따뜻함',type:'scale',labels:['매우 차가움','차가움','중립','따뜻함','매우 따뜻함'],words:['사진 전체에 뚜렷한 차가운 청색 기운, 차갑게 조정된 화이트밸런스','사진 전체에 은은한 차가운 색 기운, 약간 차가운 화이트밸런스','사진 전체의 중립적인 화이트밸런스, 따뜻하거나 차가운 색 치우침 최소화','사진 전체에 은은한 따뜻한 색 기운, 약간 따뜻한 화이트밸런스','사진 전체에 뚜렷한 따뜻한 황금빛 기운, 매우 따뜻한 화이트밸런스']},
+{group:'색감',id:'saturation',name:'채도',type:'scale',labels:['매우 낮음','낮음','보통','높음','매우 높음'],words:['전체 색채가 거의 빠진 매우 낮은 채도, 극도로 절제된 색','낮은 채도, 차분하고 은은한 색 재현','자연스러운 중간 채도, 과장되지 않은 색 재현','높은 채도, 생동감 있고 선명한 색 재현','매우 높은 채도, 강렬하고 뚜렷하게 강조된 색']},
+{group:'명암',id:'contrast',name:'전체 대비',type:'scale',labels:['매우 낮음','낮음','보통','높음','매우 높음'],words:['밝은 영역과 어두운 영역의 차이가 매우 작음, 매우 완만한 명암 변화','낮은 명암 대비, 부드러운 밝기 변화와 완만한 그림자','자연스러운 중간 대비, 균형 잡힌 밝은 영역과 그림자','높은 명암 대비, 밝고 어두운 영역의 뚜렷한 분리','매우 강한 명암 대비, 깊은 어둠과 강한 밝은 영역의 극적인 차이']},
+{group:'질감',id:'sharpness',name:'선명도',type:'scale',labels:['매우 부드러움','부드러움','자연스러움','또렷함','매우 날카로움'],words:['전체적으로 낮은 선명도, 부드럽게 표현된 미세 디테일, 과도한 샤프닝 억제','절제된 선명도, 윤곽이 부드럽고 세부 묘사가 약간 완화됨','자연스러운 선명도, 과장되지 않은 디테일과 윤곽','높은 선명도, 또렷한 윤곽과 선명한 세부 디테일','매우 높은 선명도, 정밀하고 날카로운 윤곽과 미세 디테일']},
+{group:'질감',id:'grain',name:'필름 입자감',type:'scale',labels:['없음','미세함','은은함','뚜렷함','매우 강함'],words:['필름 입자감 없이 깨끗하고 매끈한 이미지 질감','거의 눈에 띄지 않는 미세한 필름 입자','사진 전체에 은은하게 보이는 고운 필름 입자','눈에 띄는 필름 입자, 거친 아날로그 사진 질감','매우 뚜렷하고 거친 필름 입자, 강한 아날로그 그레인 질감']},
+{group:'고급 설정',id:'brightness',name:'조명 밝기',type:'scale',labels:['매우 어두움','어두움','보통','밝음','매우 밝음'],words:['매우 어두운 조명, 빛이 적은 장면','어두운 조명, 절제된 광량','자연스러운 중간 조명 밝기','밝은 조명, 장면 전반에 충분한 빛','매우 밝은 조명, 장면을 강하게 밝히는 풍부한 빛'],advanced:true},
+{group:'고급 설정',id:'shadows',name:'그림자 밝기',type:'scale',labels:['매우 어두움','어두움','보통','밝음','매우 밝음'],words:['그림자 영역이 매우 어둡고 깊음, 어두운 부분의 밝기 최소화','그림자 영역을 다소 어둡게 유지','그림자 영역의 자연스러운 밝기와 디테일','그림자 영역을 밝게 표현, 어두운 부분의 디테일 유지','그림자 영역을 크게 밝힘, 어두운 부분의 디테일이 잘 보임'],advanced:true},
+{group:'고급 설정',id:'highlights',name:'하이라이트 강도',type:'scale',labels:['매우 절제','절제','보통','강함','매우 강함'],words:['매우 절제된 하이라이트, 밝은 영역의 강한 빛 억제','부드럽게 눌린 하이라이트, 밝은 영역의 디테일 유지','자연스러운 하이라이트 강도와 밝은 영역 표현','밝은 영역이 뚜렷하게 강조된 하이라이트','매우 강렬하게 빛나는 하이라이트, 강한 밝은 부분'],advanced:true},
+{group:'고급 설정',id:'matte',name:'매트 효과',type:'scale',labels:['없음','약함','보통','강함','매우 강함'],words:['매트 효과 없음, 검정 영역이 깊고 선명함','약한 매트 효과, 검정 영역이 조금 부드럽게 들림','은은한 매트 효과, 검정 영역이 자연스럽게 옅어짐','뚜렷한 매트 효과, 검정 영역이 눈에 띄게 옅어짐','매우 강한 매트 효과, 검정 영역이 회색에 가깝게 들린 부드러운 블랙'],advanced:true},
+{group:'고급 설정',id:'skin',name:'피부 보정',type:'scale',labels:['보정 없음','매우 약함','자연스러움','매끈함','매우 강함'],words:['피부 보정 없음, 모공과 자연스러운 피부 결 유지','매우 약한 피부 보정, 자연스러운 피부 질감 대부분 유지','자연스러운 피부 보정, 피부 결을 유지하면서 가벼운 정돈','매끈하게 보정된 피부, 피부 결 일부 완화','매우 강한 피부 보정, 피부 표면이 매우 매끈하게 표현됨'],advanced:true}
+];
+
+
+const STYLE_EN={
+ focal:['Wide-angle lens with a broad field of view','Standard-angle photographic lens','Telephoto lens with a narrow field of view'],
+ source:['Natural light','Studio lighting','Indoor artificial lighting','Mixed light sources'],
+ direction:['Frontal lighting','Light coming from camera-left','Light coming from camera-right','Backlighting from behind the subject','Overhead lighting'],
+ lightColor:['Warm yellow illumination on the subject','Neutral white illumination with minimal color cast','Cool blue illumination on the subject','A single colored light source','Multicolored lighting from different colored sources'],
+ softness:['Direct hard light with sharply defined shadow edges','Relatively hard light with distinct shadow boundaries','Moderately diffused light with natural shadow transitions','Broad soft diffused light with gentle shadow transitions','Very broad diffuse light with barely defined shadow edges'],
+ palette:['Neutral whites grays and beiges','Warm earthy beige brown and olive color palette','Soft pastel pink pale blue and lavender color palette','Cool blue and cyan color palette','Natural sage olive and forest-green color palette','Vivid multicolor palette with saturated contrasting colors','Black-and-white monochrome photography'],
+ warmth:['Pronounced cool blue overall color grading','Subtly cool overall color grading','Neutral overall white balance','Subtly warm overall color grading','Pronounced warm golden overall color grading'],
+ saturation:['Extremely desaturated colors approaching monochrome','Low saturation with muted restrained colors','Natural moderate color saturation','High saturation with vivid color rendering','Very high saturation with intense vivid colors'],
+ contrast:['Very low contrast with gently separated lights and darks','Low contrast with soft tonal transitions','Natural moderate tonal contrast','High contrast with distinct light-dark separation','Very high contrast with deep shadows and bright highlights'],
+ sharpness:['Low global sharpening with soft fine details and restrained edge acuity','Restrained sharpening with slightly softened contours','Natural realistic detail and restrained sharpening','Crisp contours and sharply resolved fine detail','Very high sharpness with precise edges and fine microdetail'],
+ grain:['Clean image without visible film grain','Barely visible fine film grain','Subtle fine film grain across the photograph','Clearly visible film grain with analog texture','Heavy coarse analog film grain'],
+ brightness:['Very dim illumination with limited available light','Dim restrained lighting','Naturally balanced lighting level','Bright abundant illumination','Very bright intense illumination'],
+ shadows:['Very dark deep shadow regions','Somewhat dark shadow regions','Natural shadow brightness and detail','Lifted shadows retaining dark-area detail','Strongly lifted shadows with clearly visible dark-area detail'],
+ highlights:['Very restrained highlights without bright glare','Soft restrained highlights retaining bright-area detail','Natural photographic highlight intensity','Prominent bright highlights','Very intense luminous highlights'],
+ matte:['No matte black lift; retain deep black tones','Slightly lifted black levels with a mild matte finish','Subtle matte finish with gently lifted blacks','Pronounced matte finish with noticeably lifted blacks','Strong matte finish with significantly lifted grayish blacks'],
+ skin:['No skin retouching; preserve natural pores and texture','Minimal skin retouching retaining most texture','Natural skin retouching while preserving visible texture','Smoother retouched skin with somewhat reduced texture','Heavy skin smoothing with very reduced visible skin texture']
+};
+const styleState=Object.fromEntries(styleDefs.map(d=>[d.id,{mode:'auto',value:d.type==='scale'?3:d.type==='palette'?'neutral':d.opts[0][0]}]));
+function styleLocked(id){return ['saturation','warmth'].includes(id)&&styleState.palette.mode==='manual'&&styleState.palette.value==='mono'}
+function setupIntegratedPanels(){
+ const target=document.querySelector('#advancedCamera');target.innerHTML='<section class="section"><h2>카메라 정밀 조정</h2><div class="grid" id="advancedCameraGrid"></div></section>';
+ for(const id of ['distanceAdjust','cameraAngle','tilt','perspective','frameX','frameXAdjust','frameYAdjust']){
+   const el=document.getElementById(id);if(!el)continue;const field=el.closest('.field');if(field)document.getElementById('advancedCameraGrid').append(field);
+   const mode=document.querySelector(`[data-mode="${id}"]`);if(mode){mode.value='ai';el.disabled=true;}
+ }
+ // Basic camera height, framing and focus keep original logic and modes.
+ const height=document.getElementById('height');if(height){const hint=document.createElement('small');hint.textContent='인물의 눈높이보다 위·아래에서 촬영하는 위치를 선택합니다.';height.closest('.field').append(hint)}
+}
+function renderStyleControls(){
+ const basic=document.getElementById('styleBasic'),advanced=document.getElementById('styleAdvanced');basic.innerHTML='';advanced.innerHTML='';
+ let group='';for(const d of styleDefs){if(['distance','blur'].includes(d.id))continue;const root=d.advanced||d.id==='focal'?advanced:basic;
+ if(d.group!==group || root.dataset.lastGroup!==d.group){const h=document.createElement('h3');h.className='style-section-title';h.textContent=d.group;root.append(h);root.dataset.lastGroup=d.group;group=d.group;}
+ const s=styleState[d.id],locked=styleLocked(d.id);const w=document.createElement('div');w.className='style-control';
+ const head=document.createElement('div');head.className='style-head';const label=document.createElement('label');label.textContent=d.name;const mode=document.createElement('select');mode.setAttribute('aria-label',d.name+' 모드');for(const [v,t] of [['auto','AI 자동'],['manual','직접 설정']]){const o=document.createElement('option');o.value=v;o.textContent=t;mode.append(o)}mode.value=s.mode;mode.disabled=locked;mode.onchange=()=>{s.mode=mode.value;renderStyleControls()};head.append(label,mode);w.append(head);
+ if(locked){const n=document.createElement('div');n.className='style-warning';n.textContent='흑백 선택 중에는 적용하지 않습니다. 이전 값은 보존됩니다.';w.append(n)}
+ else if(s.mode==='manual'){
+ if(d.type==='select'){const select=document.createElement('select');select.className='style-value';for(const [v,t] of d.opts){const o=document.createElement('option');o.value=v;o.textContent=t;select.append(o)}select.value=s.value;select.onchange=()=>{s.value=select.value;renderStyleControls()};w.append(select);const desc=document.createElement('p');desc.className='style-desc';desc.textContent=d.opts.find(o=>o[0]===s.value)[2];w.append(desc)}
+ else if(d.type==='palette'){const grid=document.createElement('div');grid.className='style-swatches';for(const [v,t,desc,colors] of stylePalette){const b=document.createElement('button');b.type='button';b.className='style-palette'+(s.value===v?' chosen':'');const bar=document.createElement('div');bar.className='style-colors';for(const color of colors){const i=document.createElement('i');i.style.backgroundColor=color;bar.append(i)}const title=document.createElement('span');title.textContent=t+' · '+desc;b.append(bar,title);b.onclick=()=>{s.value=v;renderStyleControls()};grid.append(b)}w.append(grid)}
+ else {const text=document.createElement('div');text.className='style-selected';text.textContent=s.value+' / 5 · '+d.labels[s.value-1];const input=document.createElement('input');input.type='range';input.min=1;input.max=5;input.step=1;input.value=s.value;const hint=document.createElement('p');hint.className='style-desc';const sync=()=>{s.value=+input.value;text.textContent=s.value+' / 5 · '+d.labels[s.value-1];hint.textContent='출력: '+STYLE_EN[d.id][s.value-1]};input.oninput=sync;sync();w.append(text,input,hint)}
+ }root.append(w)
+ }
+ // Unified depth of field: one five-step control, adapted to original focus engine.
+ const blur=styleDefs.find(d=>d.id==='blur');const s=styleState.blur;const host=document.querySelector('#focus').closest('.field').parentElement;
+ let container=document.getElementById('integratedBlur');if(!container){container=document.createElement('div');container.id='integratedBlur';container.className='field';host.append(container)}container.innerHTML='<label>배경 흐림 · 심도</label><select id="blurMode"><option value="auto">AI 자동</option><option value="manual">직접 설정</option></select><div id="blurManual"></div>';
+ const m=container.querySelector('#blurMode');m.value=s.mode;m.onchange=()=>{s.mode=m.value;renderStyleControls()};const slot=container.querySelector('#blurManual');if(s.mode==='manual'){const t=document.createElement('div');t.className='style-selected';const inp=document.createElement('input');inp.type='range';inp.min=1;inp.max=5;inp.value=s.value;inp.step=1;inp.style.width='100%';const hint=document.createElement('small');const sync=()=>{s.value=+inp.value;t.textContent=s.value+' / 5 · '+blur.labels[s.value-1];hint.textContent=blur.words[s.value-1]};inp.oninput=sync;sync();slot.append(t,inp,hint)}
+}
+function resolveStyle(){const parts=[],warnings=[];for(const d of styleDefs){if(['distance','blur'].includes(d.id))continue;const s=styleState[d.id];if(s.mode!=='manual'||styleLocked(d.id))continue;let i=d.type==='scale'?s.value-1:d.type==='palette'?stylePalette.findIndex(p=>p[0]===s.value):d.opts.findIndex(o=>o[0]===s.value);if(i>=0&&STYLE_EN[d.id]?.[i])parts.push(STYLE_EN[d.id][i]);}
+ const focal=styleState.focal,perspMode=document.querySelector('[data-mode="perspective"]'),persp=document.getElementById('perspective');if(focal.mode==='manual'&&perspMode?.value==='direct'){if((focal.value==='wide'&&['compressed','strong_compressed'].includes(persp.value))||(focal.value==='tele'&&['strong','moderate'].includes(persp.value)))warnings.push('화각과 원근감의 조합을 확인하세요. 촬영 거리의 영향도 고려해야 합니다.');}
+ return {parts,warnings};}
+function applyBlurAdapter(){const legacy=document.getElementById('blurAdjust'),mode=document.querySelector('[data-mode="blurAdjust"]');const s=styleState.blur;if(s.mode==='auto'){mode.value='ai';legacy.value='0'}else{mode.value='direct';legacy.value=[-40,-20,0,20,40][s.value-1]} }
+
 render();
+setupIntegratedPanels();
+renderStyleControls();
 const promptEl=document.querySelector('#prompt'),resolvedEl=document.querySelector('#resolved'),statusEl=document.querySelector('#status'),randomResultEl=document.querySelector('#randomResult');
-document.querySelector('#generate').onclick=()=>{try{const s=resolve();promptEl.value=compile(s);resolvedEl.textContent=summarize(s);const rr=randomSummary(s);if(rr.length){randomResultEl.innerHTML='<b>이번 Random 결과</b>'+rr.map(x=>'• '+x).join('<br>');randomResultEl.classList.add('show')}else{randomResultEl.textContent='';randomResultEl.classList.remove('show')}statusEl.textContent=s.status==='WARNING'?'생성 완료 · 일부 설정은 큰 물리 보정이 필요합니다. 필요하면 진단 정보를 확인하세요.':s.status==='RESOLVED'?'생성 완료 · 선택을 유지하면서 최소한의 물리 보정을 적용했습니다.':'생성 완료 · 선택한 설정이 그대로 성립합니다.';statusEl.className='status'+(s.status==='WARNING'?' warn':'');}catch(err){statusEl.textContent='프롬프트 생성 오류: '+err.message;statusEl.className='status warn';console.error(err);}};
+document.querySelector('#generate').onclick=()=>{try{applyBlurAdapter();const s=resolve();const photo=resolveStyle();const base=compile(s);promptEl.value=base+(photo.parts.length?"\n\nPhotographic style: "+photo.parts.join(", ")+".":"");resolvedEl.textContent=summarize(s)+(photo.warnings.length?"\n\n사진 스타일 주의:\n- "+photo.warnings.join("\n- "):"");const rr=randomSummary(s).filter(x=>!s.pov||!['남성 자세:','남성 방향:','여성 기준 상대 위치:','두 사람의 거리:','카메라 높이:','카메라 수평 위치:','카메라 수직 틸트:','카메라 거리 조정:'].some(k=>x.startsWith(k)));if(rr.length){randomResultEl.innerHTML='<b>이번 Random 결과</b>'+rr.map(x=>'• '+x).join('<br>');randomResultEl.classList.add('show')}else{randomResultEl.textContent='';randomResultEl.classList.remove('show')}statusEl.textContent=photo.warnings.length?'생성 완료 · 사진 스타일 주의 사항을 진단 정보에서 확인하세요.':s.status==='WARNING'?'생성 완료 · 일부 설정은 큰 물리 보정이 필요합니다. 필요하면 진단 정보를 확인하세요.':s.status==='RESOLVED'?'생성 완료 · 선택을 유지하면서 최소한의 물리 보정을 적용했습니다.':'생성 완료 · 선택한 설정이 그대로 성립합니다.';statusEl.className='status'+(s.status==='WARNING'?' warn':'');}catch(err){statusEl.textContent='프롬프트 생성 오류: '+err.message;statusEl.className='status warn';console.error(err);}};
 document.querySelector('#copy').onclick=async()=>{try{await navigator.clipboard.writeText(promptEl.value);statusEl.textContent='현재 편집된 프롬프트를 복사했습니다.';}catch(err){promptEl.select();document.execCommand('copy');statusEl.textContent='현재 편집된 프롬프트를 복사했습니다.';}};
 document.querySelector('#reset').onclick=()=>location.reload();
 </script></body></html>
