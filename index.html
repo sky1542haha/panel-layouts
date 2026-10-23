@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Editorial Prompt Studio · Photo Style 통합 v1.5</title>
+<title>Editorial Prompt Studio · Photo Style 통합 v1.6</title>
 <style>
 :root{--bg:#f4f2ee;--panel:#fff;--ink:#181818;--muted:#6d6a66;--line:#d9d4cc;--accent:#24211f;--soft:#ece8e1;--warn:#8b4c22}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Noto Sans KR",sans-serif}.app{max-width:1500px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:18px}.top h1{margin:0;font-size:28px;letter-spacing:-.03em}.top p{margin:6px 0 0;color:var(--muted);font-size:13px}.badge{font-size:12px;border:1px solid var(--line);padding:7px 10px;border-radius:999px;background:#fff}.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(360px,.9fr);gap:18px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 5px 22px rgba(0,0,0,.035)}.controls{padding:18px}.output{padding:18px;position:sticky;top:16px;height:calc(100vh - 32px);display:flex;flex-direction:column}.section{border-top:1px solid var(--line);padding-top:16px;margin-top:16px}.section:first-child{border-top:0;margin-top:0;padding-top:0}.section h2{font-size:15px;margin:0 0 12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}.field small{display:block;color:var(--muted);font-size:11px;margin-top:5px;line-height:1.35}select,input[type=text],textarea{width:100%;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);padding:9px 10px;font:inherit}select{font-size:13px} select:disabled{background:#f1f1f1;color:#999;cursor:not-allowed;opacity:.72}textarea{resize:vertical}.rangeRow{display:grid;grid-template-columns:1fr 54px;gap:8px;align-items:center}.rangeRow input[type=range]{width:100%}.value{font-size:12px;text-align:center;background:var(--soft);padding:5px;border-radius:7px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}button{border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:9px;padding:9px 13px;font-weight:700;cursor:pointer}button.secondary{background:#fff;color:var(--ink);border-color:var(--line)}#prompt{flex:1;min-height:320px;line-height:1.55;font-size:13px}.status{font-size:12px;color:var(--muted);margin:8px 0 12px}.status.warn{color:var(--warn)}.randomResult{display:none;margin-top:12px;padding:10px 12px;background:#f7f5f1;border:1px solid var(--line);border-radius:10px;font-size:12px;line-height:1.5}.randomResult.show{display:block}.randomResult b{display:block;margin-bottom:4px}.diag{margin-top:10px;border:1px solid var(--line);border-radius:10px;background:#faf9f7}.diag summary{cursor:pointer;padding:9px 11px;font-size:12px;font-weight:700;color:var(--muted);user-select:none}.resolved{margin:0;padding:0 11px 11px;background:transparent;border-radius:0;font-size:11px;color:var(--muted);max-height:150px;overflow:auto;white-space:pre-wrap}.full{grid-column:1/-1}@media(max-width:900px){.layout{grid-template-columns:1fr}.output{position:static;height:auto}.grid{grid-template-columns:1fr}#prompt{min-height:420px}}
@@ -49,9 +49,9 @@ button.secondary{background:#222e42;color:#e8effb;border-color:#495b73}
 </style>
 </head>
 <body><nav class="site-nav" aria-label="생성기 페이지 이동"><span class="site-nav-title">PROMPT STUDIO</span><div class="site-nav-links"><a href="index.html" aria-current="page">통합 생성기</a><a href="photo_style.html">사진 스타일 전용</a></div></nav><div class="app">
-<div class="top"><div><h1>EDITORIAL PROMPT STUDIO</h1><p>장면·인물 + 사진 스타일 · 통합 생성기 · v1.5</p></div><div class="badge">v1.5 · AI 없이 작동 · GitHub Pages 가능</div></div>
+<div class="top"><div><h1>EDITORIAL PROMPT STUDIO</h1><p>장면·인물 + 사진 스타일 · 통합 생성기 · v1.6</p></div><div class="badge">v1.6 · AI 없이 작동 · GitHub Pages 가능</div></div>
 <div class="layout"><div class="panel controls" id="controls"></div><div class="panel controls advanced-panel"><h2>고급 설정 <small style="font-weight:400;color:var(--muted)">· 초기 AI 자동</small></h2><div id="advancedCamera"></div><div id="styleAdvanced"></div></div><div class="panel output">
-<div class="actions"><button id="generate">프롬프트 생성</button><button class="secondary" id="copy">복사</button><button class="secondary" id="reset">초기화</button></div>
+<div class="actions"><button id="generate">프롬프트 생성</button><button class="secondary" id="copy">복사</button><button class="secondary" id="reset">저장된 작업 초기화</button></div><div id="saveStatus" class="status">이 기기의 Safari에 작업 설정을 자동 저장합니다.</div>
 <div id="status" class="status">설정을 선택한 뒤 프롬프트를 생성하세요. 생성 후 아래 문장은 자유롭게 수정할 수 있습니다.</div>
 <textarea id="prompt" placeholder="Generated prompt appears here..."></textarea>
 <div id="randomResult" class="randomResult"></div><details class="diag"><summary>진단 정보 보기</summary><div id="resolved" class="resolved">프롬프트를 생성하면 상세 해결 상태가 표시됩니다.</div></details>
@@ -362,11 +362,99 @@ function resolveStyle(){const parts=[],warnings=[];for(const d of styleDefs){if(
  return {parts,warnings};}
 function applyBlurAdapter(){const legacy=document.getElementById('blurAdjust'),mode=document.querySelector('[data-mode="blurAdjust"]');const s=styleState.blur;if(s.mode==='auto'){mode.value='ai';legacy.value='0'}else{mode.value='direct';legacy.value=[-40,-20,0,20,40][s.value-1]} }
 
+const WORKSPACE_STORAGE_KEY='editorialPromptStudio:workspace';
+const WORKSPACE_SCHEMA_VERSION=1;
+let workspaceSaveTimer=null;
+let workspaceRestoring=false;
+function readWorkspaceState(){
+ try{
+  const raw=localStorage.getItem(WORKSPACE_STORAGE_KEY);
+  if(!raw)return null;
+  const state=JSON.parse(raw);
+  if(!state||state.schemaVersion!==WORKSPACE_SCHEMA_VERSION)return null;
+  return state;
+ }catch(err){console.warn('작업 상태 불러오기 실패',err);return null}
+}
+function workspaceControlSnapshot(){
+ const controls={};
+ document.querySelectorAll('#controls input,#controls select,#controls textarea,.advanced-panel input,.advanced-panel select,.advanced-panel textarea').forEach(el=>{
+  if(!el.id||el.id==='prompt'||el.disabled&&el.type==='hidden')return;
+  if(el.type==='checkbox'||el.type==='radio')controls[el.id]=el.checked;
+  else controls[el.id]=el.value;
+ });
+ const modes={};
+ document.querySelectorAll('select[data-mode]').forEach(el=>{modes[el.dataset.mode]=el.value});
+ return {controls,modes};
+}
+function writeWorkspaceState(){
+ if(workspaceRestoring)return;
+ try{
+  const snap=workspaceControlSnapshot();
+  const state={schemaVersion:WORKSPACE_SCHEMA_VERSION,savedAt:new Date().toISOString(),controls:snap.controls,modes:snap.modes,styleState:JSON.parse(JSON.stringify(styleState))};
+  localStorage.setItem(WORKSPACE_STORAGE_KEY,JSON.stringify(state));
+  const el=document.getElementById('saveStatus');if(el){const d=new Date();el.textContent='자동 저장됨 · '+d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})+' · 이 기기의 브라우저에만 저장';}
+ }catch(err){const el=document.getElementById('saveStatus');if(el){el.textContent='자동 저장 실패 · Safari 사이트 저장공간을 확인하세요.';el.className='status warn'}console.warn('작업 상태 저장 실패',err)}
+}
+function scheduleWorkspaceSave(){
+ if(workspaceRestoring)return;
+ clearTimeout(workspaceSaveTimer);
+ workspaceSaveTimer=setTimeout(writeWorkspaceState,350);
+}
+function setStoredControlValue(el,value){
+ if(!el||value===undefined||value===null)return;
+ if(el.type==='checkbox'||el.type==='radio')el.checked=!!value;
+ else if([...el.options||[]].length && ![...el.options].some(o=>o.value===String(value)))return;
+ else el.value=String(value);
+}
+function restoreWorkspaceState(state){
+ if(!state)return false;
+ workspaceRestoring=true;
+ try{
+  if(state.styleState&&typeof state.styleState==='object'){
+   for(const [id,saved] of Object.entries(state.styleState)){
+    if(styleState[id]&&saved&&typeof saved==='object'){
+     if(saved.mode==='auto'||saved.mode==='manual')styleState[id].mode=saved.mode;
+     if(saved.value!==undefined)styleState[id].value=saved.value;
+    }
+   }
+  }
+  const v=state.controls||{};
+  setStoredControlValue(document.getElementById('poseMode'),v.poseMode);
+  setStoredControlValue(document.getElementById('seatType'),v.seatType);
+  updatePoseSlots();
+  for(const [id,value] of Object.entries(v))setStoredControlValue(document.getElementById(id),value);
+  for(const [id,value] of Object.entries(state.modes||{})){
+   const mode=document.querySelector('select[data-mode="'+CSS.escape(id)+'"]');
+   if(mode)setStoredControlValue(mode,value);
+  }
+  document.querySelectorAll('.rangeRow input[type="range"]').forEach(el=>el.dispatchEvent(new Event('input',{bubbles:false})));
+  document.querySelectorAll('select[data-mode]').forEach(el=>el.dispatchEvent(new Event('change',{bubbles:false})));
+  const rep=document.getElementById('representation');if(rep)rep.dispatchEvent(new Event('change',{bubbles:false}));
+  updateHandCompatibilityUI();
+  return true;
+ }catch(err){console.warn('작업 상태 복원 실패',err);return false}
+ finally{workspaceRestoring=false}
+}
+const savedWorkspace=readWorkspaceState();
+
 render();
 setupIntegratedPanels();
+if(savedWorkspace?.styleState){
+ for(const [id,saved] of Object.entries(savedWorkspace.styleState)){
+  if(styleState[id]&&saved&&typeof saved==='object'){
+   if(saved.mode==='auto'||saved.mode==='manual')styleState[id].mode=saved.mode;
+   if(saved.value!==undefined)styleState[id].value=saved.value;
+  }
+ }
+}
 renderStyleControls();
+const restoredWorkspace=restoreWorkspaceState(savedWorkspace);
+document.addEventListener('change',e=>{if(e.target.closest('#controls,.advanced-panel'))scheduleWorkspaceSave()});
+document.addEventListener('input',e=>{if(e.target.closest('#controls,.advanced-panel'))scheduleWorkspaceSave()});
+document.addEventListener('click',e=>{if(e.target.closest('.style-palette'))scheduleWorkspaceSave()});
+setTimeout(()=>{const el=document.getElementById('saveStatus');if(el&&restoredWorkspace)el.textContent='저장된 작업 설정을 복원했습니다. 이후 변경사항은 자동 저장됩니다.';},0);
 const promptEl=document.querySelector('#prompt'),resolvedEl=document.querySelector('#resolved'),statusEl=document.querySelector('#status'),randomResultEl=document.querySelector('#randomResult');
 document.querySelector('#generate').onclick=()=>{try{applyBlurAdapter();const s=resolve();const photo=resolveStyle();promptEl.value=compile(s,photo.parts);resolvedEl.textContent=summarize(s)+(photo.warnings.length?"\n\n사진 스타일 주의:\n- "+photo.warnings.join("\n- "):"");const rr=randomSummary(s).filter(x=>!s.pov||!['남성 자세:','남성 방향:','여성 기준 상대 위치:','두 사람의 거리:','카메라 거리 조정:'].some(k=>x.startsWith(k)));if(rr.length){randomResultEl.innerHTML='<b>이번 Random 결과</b>'+rr.map(x=>'• '+x).join('<br>');randomResultEl.classList.add('show')}else{randomResultEl.textContent='';randomResultEl.classList.remove('show')}statusEl.textContent=photo.warnings.length?'생성 완료 · 사진 스타일 주의 사항을 진단 정보에서 확인하세요.':s.status==='WARNING'?'생성 완료 · 서로 충돌하는 명시적 선택이 있습니다. 진단 정보를 확인하세요.':s.status==='RESOLVED'?'생성 완료 · 선택을 최대한 유지하면서 필요한 물리 보정을 적용했습니다.':s.status==='CHECK'?'생성 완료 · 선택값은 유지했습니다. 생성 난도가 높은 조합은 진단 정보를 확인하세요.':'생성 완료 · 선택한 설정이 그대로 성립합니다.';statusEl.className='status'+(s.status==='WARNING'?' warn':'');}catch(err){statusEl.textContent='프롬프트 생성 오류: '+err.message;statusEl.className='status warn';console.error(err);}};
 document.querySelector('#copy').onclick=async()=>{try{await navigator.clipboard.writeText(promptEl.value);statusEl.textContent='현재 편집된 프롬프트를 복사했습니다.';}catch(err){promptEl.select();document.execCommand('copy');statusEl.textContent='현재 편집된 프롬프트를 복사했습니다.';}};
-document.querySelector('#reset').onclick=()=>location.reload();
+document.querySelector('#reset').onclick=()=>{if(!confirm('이 기기에 저장된 작업 설정을 지우고 기본값으로 돌아갈까요?'))return;try{localStorage.removeItem(WORKSPACE_STORAGE_KEY)}catch(err){console.warn(err)}location.reload();};
 </script></body></html>
